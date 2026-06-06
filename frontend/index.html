@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>ValueGuard — Real Estate Fair Value Detection</title>
+  <meta name="description" content="ValueGuard compares government circle rates against estimated market rates to detect overpriced or speculative real estate in Indian tech hub cities." />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="print.css" />
+
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<!-- Print-only report header -->
+<div class="print-header" aria-hidden="true">
+  <h1>ValueGuard — Property Valuation Report</h1>
+  <p id="print-timestamp"></p>
+</div>
+
+<div class="app-shell">
+
+  <!-- ══════════════════════ TOP BAR ══════════════════════ -->
+  <header class="topbar" role="banner">
+    <div class="topbar-brand">
+      <div class="brand-icon" aria-hidden="true"></div>
+      <span class="brand-name">Value<span>Guard</span></span>
+    </div>
+    <div class="topbar-meta">
+      <div class="live-badge" aria-label="API status: Live">
+        <div class="live-dot"></div>
+        <span>Live</span>
+      </div>
+      <div class="topbar-time" id="topbar-clock" aria-live="polite" aria-atomic="true"></div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+  <aside class="sidebar" role="complementary" aria-label="Valuation controls">
+
+    <!-- Location Selection -->
+    <section class="sidebar-section" aria-labelledby="location-section-title">
+      <h2 class="sidebar-title" id="location-section-title">Location</h2>
+
+      <div class="field-group">
+        <label class="field-label" for="city-select">City</label>
+        <div class="select-wrapper">
+          <select id="city-select" aria-label="Select city">
+            <option value="">— Loading cities… —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="zone-select">Zone</label>
+        <div class="select-wrapper">
+          <select id="zone-select" aria-label="Select zone" disabled>
+            <option value="">— Select a city first —</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sliders -->
+    <section class="sidebar-section" aria-labelledby="params-section-title">
+      <h2 class="sidebar-title" id="params-section-title">Parameters</h2>
+
+      <!-- Property Age -->
+      <div class="slider-group">
+        <div class="slider-header">
+          <label class="slider-label" for="slider-age">Property Age</label>
+          <span class="slider-value" id="val-age" aria-live="polite" aria-atomic="true">5 yrs</span>
+        </div>
+        <input
+          type="range"
+          id="slider-age"
+          min="0" max="40" step="1" value="5"
+          aria-label="Property age in years"
+          aria-valuemin="0" aria-valuemax="40" aria-valuenow="5"
+        />
+        <div class="slider-hint" aria-hidden="true"><span>0 yrs</span><span>40 yrs</span></div>
+      </div>
+
+      <!-- Metro Distance -->
+      <div class="slider-group">
+        <div class="slider-header">
+          <label class="slider-label" for="slider-metro">Metro Distance</label>
+          <span class="slider-value" id="val-metro" aria-live="polite" aria-atomic="true">3.0 km</span>
+        </div>
+        <input
+          type="range"
+          id="slider-metro"
+          min="0" max="10" step="0.5" value="3"
+          aria-label="Distance to nearest metro station in kilometres"
+          aria-valuemin="0" aria-valuemax="10" aria-valuenow="3"
+        />
+        <div class="slider-hint" aria-hidden="true"><span>0 km</span><span>10 km</span></div>
+      </div>
+
+      <!-- Speculation Factor -->
+      <div class="slider-group">
+        <div class="slider-header">
+          <label class="slider-label" for="slider-speculation">Speculation Factor</label>
+          <span class="slider-value" id="val-speculation" aria-live="polite" aria-atomic="true">2 — Low</span>
+        </div>
+        <input
+          type="range"
+          id="slider-speculation"
+          min="1" max="5" step="1" value="2"
+          aria-label="Market speculation factor from 1 low to 5 high"
+          aria-valuemin="1" aria-valuemax="5" aria-valuenow="2"
+        />
+        <div class="slider-hint" aria-hidden="true"><span>1 Low</span><span>5 High</span></div>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="sidebar-section" aria-labelledby="actions-section-title">
+      <h2 class="sidebar-title" id="actions-section-title">Export</h2>
+      <div class="export-row">
+        <button class="btn btn-ghost" id="btn-export-csv" aria-label="Export results as CSV file" title="Export CSV">
+          ⬇ CSV
+        </button>
+        <button class="btn btn-ghost" id="btn-print" aria-label="Print valuation report" title="Print Report">
+          🖨 Print
+        </button>
+      </div>
+    </section>
+
+    <!-- Error Banner -->
+    <div class="error-banner" id="error-banner" role="alert" aria-live="assertive">
+      <span>⚠</span>
+      <span id="error-message">Unable to connect to server.</span>
+    </div>
+
+  </aside>
+
+  <!-- ══════════════════════ MAIN CONTENT ══════════════════════ -->
+  <main class="main-content" role="main" id="main-panel">
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar" role="tablist" aria-label="Dashboard views">
+      <button
+        class="tab-btn active"
+        id="tab-btn-valuate"
+        role="tab"
+        aria-selected="true"
+        aria-controls="tab-valuate"
+      >
+        ⚖ Valuate
+      </button>
+      <button
+        class="tab-btn"
+        id="tab-btn-heatmap"
+        role="tab"
+        aria-selected="false"
+        aria-controls="tab-heatmap"
+      >
+        🗺 City Heatmap
+      </button>
+    </nav>
+
+    <!-- ─── Tab: Valuate ─── -->
+    <section class="tab-panel active" id="tab-valuate" role="tabpanel" aria-labelledby="tab-btn-valuate">
+
+      <!-- Rate Cards -->
+      <div class="rate-cards">
+        <!-- Circle Rate Card -->
+        <div class="rate-card neutral" id="card-circle" aria-label="Government circle rate">
+          <div class="card-label">Govt. Circle Rate ₹/sqft</div>
+          <div class="card-value" id="circle-rate-value">—</div>
+          <div class="card-unit" id="circle-rate-zone">Select a zone to begin</div>
+        </div>
+
+        <!-- Market Rate Card -->
+        <div class="rate-card" id="card-market" aria-label="Estimated market rate">
+          <div class="card-label">Est. Market Rate ₹/sqft</div>
+          <div class="card-value" id="market-rate-value">—</div>
+          <div class="card-unit" id="market-rate-risk">—</div>
+        </div>
+      </div>
+
+      <!-- Variance Gauge -->
+      <div class="gauge-card" aria-label="Variance and risk level">
+        <div class="gauge-header">
+          <span class="gauge-title">Variance vs Circle Rate</span>
+          <span class="risk-badge default" id="risk-badge" aria-live="polite" aria-atomic="true">—</span>
+        </div>
+        <div class="gauge-track" role="meter" aria-label="Variance percentage" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div class="gauge-fill" id="gauge-fill">0%</div>
+        </div>
+        <div class="gauge-scale" aria-hidden="true">
+          <span>0%</span>
+          <span class="mark-20">20%</span>
+          <span class="mark-50">50%</span>
+          <span>100%+</span>
+        </div>
+      </div>
+
+      <!-- Insight Card -->
+      <div class="insight-card" id="insight-card" aria-live="polite" aria-atomic="true">
+        <span class="insight-icon" id="insight-icon" aria-hidden="true">💡</span>
+        <p class="insight-text" id="insight-text">
+          Select a city and zone, then adjust the sliders to generate a valuation. Results will appear here.
+        </p>
+      </div>
+
+      <!-- Breakdown -->
+      <div class="breakdown-card" id="breakdown-card">
+        <div class="breakdown-title">Valuation Breakdown</div>
+        <div class="breakdown-grid">
+          <div class="breakdown-item">
+            <span class="breakdown-item-label">Base (Circle × Mult.)</span>
+            <span class="breakdown-item-value" id="bd-base">—</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="breakdown-item-label">Metro Premium</span>
+            <span class="breakdown-item-value positive" id="bd-metro">—</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="breakdown-item-label">Age Depreciation</span>
+            <span class="breakdown-item-value negative" id="bd-depr">—</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="breakdown-item-label">Speculative Uplift</span>
+            <span class="breakdown-item-value positive" id="bd-spec">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-title">Rate Comparison — ₹/sqft</span>
+          <div class="chart-legend" aria-hidden="true">
+            <span class="legend-dot" style="--dot-color: rgba(0,212,255,0.7)">Circle Rate</span>
+            <span class="legend-dot" style="--dot-color: rgba(16,185,129,0.7)">Market Rate</span>
+            <span class="legend-dot" style="--dot-color: rgba(245,158,11,0.5)">City Avg</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="comparison-chart" aria-label="Bar chart comparing circle rate, market rate, and city average"></canvas>
+        </div>
+      </div>
+
+      <!-- Query History Drawer -->
+      <div class="history-drawer" id="history-drawer">
+        <button class="drawer-toggle" id="drawer-toggle" aria-expanded="false" aria-controls="drawer-body">
+          <span class="drawer-toggle-left">
+            <span>🕐 Last Queries</span>
+            <span class="drawer-count" id="drawer-count">0</span>
+          </span>
+          <span class="drawer-chevron" aria-hidden="true">▾</span>
+        </button>
+        <div class="drawer-body" id="drawer-body" role="region" aria-label="Query history">
+          <div class="history-list" id="history-list">
+            <p class="history-empty">No queries yet. Run a valuation to see history.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ─── Tab: City Heatmap ─── -->
+    <section class="tab-panel" id="tab-heatmap" role="tabpanel" aria-labelledby="tab-btn-heatmap">
+      <div class="heatmap-header">
+        <div class="heatmap-title">City Zone Heatmap</div>
+        <p class="heatmap-subtitle" id="heatmap-subtitle">Select a city to view all zones and their risk profile.</p>
+      </div>
+      <div class="heatmap-table-wrap" id="heatmap-table-wrap">
+        <div class="heatmap-empty">Select a city from the control panel to load the heatmap.</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="script.js" defer></script>
+</body>
+</html>

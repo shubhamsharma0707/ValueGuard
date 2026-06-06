@@ -1,0 +1,152 @@
+[
+  {
+    "id": "noida_sec62",
+    "zone_name": "Sector 62 Noida",
+    "city": "Noida",
+    "circle_rate_per_sqft": 5500,
+    "avg_market_rate_per_sqft": 8200,
+    "zone_multiplier": 1.42,
+    "metro_nearby": true,
+    "it_corridor": true
+  },
+  {
+    "id": "noida_sec18",
+    "zone_name": "Sector 18 Noida",
+    "city": "Noida",
+    "circle_rate_per_sqft": 6200,
+    "avg_market_rate_per_sqft": 9800,
+    "zone_multiplier": 1.55,
+    "metro_nearby": true,
+    "it_corridor": false
+  },
+  {
+    "id": "blr_whitefield",
+    "zone_name": "Whitefield Bengaluru",
+    "city": "Bengaluru",
+    "circle_rate_per_sqft": 6800,
+    "avg_market_rate_per_sqft": 11500,
+    "zone_multiplier": 1.62,
+    "metro_nearby": false,
+    "it_corridor": true
+  },
+  {
+    "id": "blr_electronic_city",
+    "zone_name": "Electronic City Bengaluru",
+    "city": "Bengaluru",
+    "circle_rate_per_sqft": 4900,
+    "avg_market_rate_per_sqft": 7800,
+    "zone_multiplier": 1.48,
+    "metro_nearby": false,
+    "it_corridor": true
+  },
+  {
+    "id": "blr_sarjapur",
+    "zone_name": "Sarjapur Road Bengaluru",
+    "city": "Bengaluru",
+    "circle_rate_per_sqft": 5800,
+    "avg_market_rate_per_sqft": 9200,
+    "zone_multiplier": 1.50,
+    "metro_nearby": false,
+    "it_corridor": true
+  },
+  {
+    "id": "pune_hinjewadi",
+    "zone_name": "Hinjewadi Pune",
+    "city": "Pune",
+    "circle_rate_per_sqft": 5200,
+    "avg_market_rate_per_sqft": 8500,
+    "zone_multiplier": 1.55,
+    "metro_nearby": false,
+    "it_corridor": true
+  },
+  {
+    "id": "pune_magarpatta",
+    "zone_name": "Magarpatta Pune",
+    "city": "Pune",
+    "circle_rate_per_sqft": 6500,
+    "avg_market_rate_per_sqft": 10200,
+    "zone_multiplier": 1.48,
+    "metro_nearby": true,
+    "it_corridor": true
+  },
+  {
+    "id": "hyd_gachibowli",
+    "zone_name": "Gachibowli Hyderabad",
+    "city": "Hyderabad",
+    "circle_rate_per_sqft": 5800,
+    "avg_market_rate_per_sqft": 9600,
+    "zone_multiplier": 1.58,
+    "metro_nearby": true,
+    "it_corridor": true
+  },
+  {
+    "id": "hyd_hitech_city",
+    "zone_name": "HITEC City Hyderabad",
+    "city": "Hyderabad",
+    "circle_rate_per_sqft": 7200,
+    "avg_market_rate_per_sqft": 12800,
+    "zone_multiplier": 1.72,
+    "metro_nearby": true,
+    "it_corridor": true
+  },
+  {
+    "id": "che_omr",
+    "zone_name": "OMR Chennai",
+    "city": "Chennai",
+    "circle_rate_per_sqft": 4800,
+    "avg_market_rate_per_sqft": 7600,
+    "zone_multiplier": 1.45,
+    "metro_nearby": false,
+    "it_corridor": true
+  },
+  {
+    "id": "che_sholinganallur",
+    "zone_name": "Sholinganallur Chennai",
+    "city": "Chennai",
+    "circle_rate_per_sqft": 5100,
+    "avg_market_rate_per_sqft": 8100,
+    "zone_multiplier": 1.50,
+    "metro_nearby": false,
+    "it_corridor": true
+  },
+  {
+    "id": "kol_salt_lake",
+    "zone_name": "Salt Lake Kolkata",
+    "city": "Kolkata",
+    "circle_rate_per_sqft": 4200,
+    "avg_market_rate_per_sqft": 6500,
+    "zone_multiplier": 1.38,
+    "metro_nearby": true,
+    "it_corridor": true
+  },
+  {
+    "id": "kol_new_town",
+    "zone_name": "New Town Kolkata",
+    "city": "Kolkata",
+    "circle_rate_per_sqft": 3800,
+    "avg_market_rate_per_sqft": 5900,
+    "zone_multiplier": 1.35,
+    "metro_nearby": false,
+    "it_corridor": true
+  },
+  {
+    "id": "grg_cyber_city",
+    "zone_name": "Cyber City Gurugram",
+    "city": "Gurugram",
+    "circle_rate_per_sqft": 8500,
+    "avg_market_rate_per_sqft": 16000,
+    "zone_multiplier": 1.82,
+    "metro_nearby": true,
+    "it_corridor": true
+  },
+  {
+    "id": "grg_sohna_road",
+    "zone_name": "Sohna Road Gurugram",
+    "city": "Gurugram",
+    "circle_rate_per_sqft": 6800,
+    "avg_market_rate_per_sqft": 11200,
+    "zone_multiplier": 1.60,
+    "metro_nearby": false,
+    "it_corridor": true
+  }
+]

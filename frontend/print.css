@@ -1,0 +1,137 @@
+/* ValueGuard — Print Stylesheet
+   Hides controls and sidebar; shows only result cards, gauge, and chart.
+*/
+
+@media print {
+  /* Hide everything by default */
+  .sidebar,
+  .topbar,
+  .tab-bar,
+  .export-row,
+  .history-drawer,
+  .error-banner,
+  .heatmap-header,
+  .heatmap-table-wrap,
+  #tab-heatmap,
+  .tab-panel:not(#tab-valuate) {
+    display: none !important;
+  }
+
+  /* Reset body for print */
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Show full-width content */
+  .app-shell {
+    display: block !important;
+  }
+
+  .main-content {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  #tab-valuate {
+    display: block !important;
+  }
+
+  /* Rate cards — print friendly */
+  .rate-cards {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12pt !important;
+    margin-bottom: 16pt;
+  }
+
+  .rate-card {
+    background: #f8fafc !important;
+    border: 1pt solid #cbd5e1 !important;
+    border-radius: 6pt !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  .card-label { color: #64748b !important; }
+  .card-value { color: #0f172a !important; font-size: 22pt !important; }
+  .card-unit { color: #94a3b8 !important; }
+
+  /* Gauge */
+  .gauge-card {
+    background: #f8fafc !important;
+    border: 1pt solid #cbd5e1 !important;
+    border-radius: 6pt !important;
+    margin-bottom: 12pt;
+    page-break-inside: avoid;
+  }
+
+  .gauge-track {
+    background: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  .risk-badge {
+    border: 1pt solid #cbd5e1 !important;
+  }
+
+  /* Insight card */
+  .insight-card {
+    background: #f8fafc !important;
+    border: 1pt solid #cbd5e1 !important;
+    margin-bottom: 12pt;
+    page-break-inside: avoid;
+  }
+
+  .insight-text { color: #374151 !important; }
+
+  /* Breakdown */
+  .breakdown-card {
+    background: #f8fafc !important;
+    border: 1pt solid #cbd5e1 !important;
+    margin-bottom: 12pt;
+    page-break-inside: avoid;
+  }
+
+  .breakdown-title,
+  .breakdown-item-label { color: #64748b !important; }
+  .breakdown-item-value { color: #0f172a !important; }
+
+  /* Chart */
+  .chart-card {
+    background: #f8fafc !important;
+    border: 1pt solid #cbd5e1 !important;
+    border-radius: 6pt !important;
+    page-break-inside: avoid;
+  }
+
+  .chart-title { color: #64748b !important; }
+
+  /* Print header */
+  .print-header {
+    display: block !important;
+    text-align: center;
+    margin-bottom: 20pt;
+    padding-bottom: 10pt;
+    border-bottom: 2pt solid #0f1117;
+  }
+
+  .print-header h1 {
+    font-size: 18pt;
+    font-weight: 700;
+    color: #0f1117;
+  }
+
+  .print-header p {
+    font-size: 9pt;
+    color: #64748b;
+    margin-top: 4pt;
+  }
+
+  /* Page breaks */
+  .chart-card { page-break-before: auto; }
+}
+
+/* Hidden by default — only shown on print */
+.print-header { display: none; }
