@@ -12,7 +12,14 @@
   .error-banner,
   .heatmap-header,
   .heatmap-table-wrap,
+  .sensitivity-card,
+  .emi-section,
+  .hamburger-btn,
+  .theme-toggle,
+  .toast,
   #tab-heatmap,
+  #tab-compare,
+  #tab-trends,
   .tab-panel:not(#tab-valuate) {
     display: none !important;
   }
@@ -87,6 +94,10 @@
   .insight-text { color: #374151 !important; }
 
   /* Breakdown */
+  .bottom-row {
+    display: block !important;
+  }
+
   .breakdown-card {
     background: #f8fafc !important;
     border: 1pt solid #cbd5e1 !important;

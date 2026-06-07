@@ -11,6 +11,7 @@ require('dotenv').config({ path: __dirname + '/.env' });
 const express = require('express');
 const cors = require('cors');
 const valuateRouter = require('./routes/valuate');
+const trendsRouter  = require('./routes/trends');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,11 +21,13 @@ app.use(cors());
 app.use(express.json());
 
 // --- API Routes ---
+// Trends router must be mounted BEFORE the catch-all valuate router
+app.use('/api/trends', trendsRouter);
 app.use('/api', valuateRouter);
 
 // --- Health Check ---
 app.get('/', (req, res) => {
-  res.json({ status: 'ValueGuard API is running', version: '1.0.0' });
+  res.json({ status: 'ValueGuard API is running', version: '2.0.0' });
 });
 
 // --- 404 Handler ---
@@ -45,4 +48,5 @@ app.listen(PORT, () => {
   console.log(`   GET  http://localhost:${PORT}/api/locations`);
   console.log(`   POST http://localhost:${PORT}/api/valuate`);
   console.log(`   GET  http://localhost:${PORT}/api/history`);
+  console.log(`   GET  http://localhost:${PORT}/api/trends/:location_id`);
 });

@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="color-scheme" content="dark light" />
   <title>ValueGuard — Real Estate Fair Value Detection</title>
   <meta name="description" content="ValueGuard compares government circle rates against estimated market rates to detect overpriced or speculative real estate in Indian tech hub cities." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
@@ -26,9 +31,17 @@
 
   <!-- ══════════════════════ TOP BAR ══════════════════════ -->
   <header class="topbar" role="banner">
-    <div class="topbar-brand">
-      <div class="brand-icon" aria-hidden="true"></div>
-      <span class="brand-name">Value<span>Guard</span></span>
+    <div class="topbar-left">
+      <!-- Mobile hamburger -->
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+      <div class="topbar-brand">
+        <div class="brand-icon" aria-hidden="true"></div>
+        <span class="brand-name">Value<span>Guard</span></span>
+      </div>
     </div>
     <div class="topbar-meta">
       <div class="live-badge" aria-label="API status: Live">
@@ -36,11 +49,18 @@
         <span>Live</span>
       </div>
       <div class="topbar-time" id="topbar-clock" aria-live="polite" aria-atomic="true"></div>
+      <!-- Theme toggle -->
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+        <span class="theme-icon" id="theme-icon">☀️</span>
+      </button>
     </div>
   </header>
 
+  <!-- ══════════════════════ SIDEBAR OVERLAY (mobile) ══════════════════════ -->
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
   <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
-  <aside class="sidebar" role="complementary" aria-label="Valuation controls">
+  <aside class="sidebar" id="sidebar" role="complementary" aria-label="Valuation controls">
 
     <!-- Location Selection -->
     <section class="sidebar-section" aria-labelledby="location-section-title">
@@ -118,12 +138,66 @@
       </div>
     </section>
 
+    <!-- ── EMI / Loan Calculator ── -->
+    <section class="sidebar-section emi-section" aria-labelledby="emi-section-title">
+      <h2 class="sidebar-title" id="emi-section-title">
+        <button class="collapsible-toggle" id="emi-toggle" aria-expanded="false" aria-controls="emi-body">
+          <span>🏦 EMI Calculator</span>
+          <span class="drawer-chevron" aria-hidden="true">▾</span>
+        </button>
+      </h2>
+      <div class="emi-body" id="emi-body" hidden>
+        <div class="emi-grid">
+          <div class="field-group">
+            <label class="field-label" for="emi-area">Property Size (sqft)</label>
+            <input type="number" id="emi-area" class="emi-input" min="100" max="10000" step="50" value="1000" aria-label="Property size in square feet" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="emi-rate">Interest Rate (%)</label>
+            <input type="number" id="emi-rate" class="emi-input" min="5" max="20" step="0.1" value="8.5" aria-label="Annual interest rate in percent" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="emi-tenure">Tenure (years)</label>
+            <input type="number" id="emi-tenure" class="emi-input" min="1" max="30" step="1" value="20" aria-label="Loan tenure in years" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="emi-income">Monthly Income (₹)</label>
+            <input type="number" id="emi-income" class="emi-input" min="10000" max="10000000" step="5000" value="150000" aria-label="Monthly gross income in rupees" />
+          </div>
+        </div>
+        <div class="emi-results" id="emi-results">
+          <div class="emi-result-row">
+            <span class="emi-result-label">Loan Amount</span>
+            <span class="emi-result-value" id="emi-loan-amount">—</span>
+          </div>
+          <div class="emi-result-row">
+            <span class="emi-result-label">Monthly EMI</span>
+            <span class="emi-result-value accent" id="emi-monthly">—</span>
+          </div>
+          <div class="emi-result-row">
+            <span class="emi-result-label">Total Interest</span>
+            <span class="emi-result-value" id="emi-interest">—</span>
+          </div>
+          <div class="emi-result-row">
+            <span class="emi-result-label">Affordability</span>
+            <span class="emi-badge" id="emi-badge">—</span>
+          </div>
+        </div>
+        <div class="emi-chart-wrap">
+          <canvas id="emi-chart" aria-label="Donut chart showing principal versus total interest breakdown"></canvas>
+        </div>
+      </div>
+    </section>
+
     <!-- Actions -->
     <section class="sidebar-section" aria-labelledby="actions-section-title">
       <h2 class="sidebar-title" id="actions-section-title">Export</h2>
       <div class="export-row">
         <button class="btn btn-ghost" id="btn-export-csv" aria-label="Export results as CSV file" title="Export CSV">
           ⬇ CSV
+        </button>
+        <button class="btn btn-ghost" id="btn-copy-url" aria-label="Copy shareable link to clipboard" title="Copy Link">
+          🔗 Share
         </button>
         <button class="btn btn-ghost" id="btn-print" aria-label="Print valuation report" title="Print Report">
           🖨 Print
@@ -160,7 +234,25 @@
         aria-selected="false"
         aria-controls="tab-heatmap"
       >
-        🗺 City Heatmap
+        🗺 Heatmap
+      </button>
+      <button
+        class="tab-btn"
+        id="tab-btn-compare"
+        role="tab"
+        aria-selected="false"
+        aria-controls="tab-compare"
+      >
+        ⚡ Compare
+      </button>
+      <button
+        class="tab-btn"
+        id="tab-btn-trends"
+        role="tab"
+        aria-selected="false"
+        aria-controls="tab-trends"
+      >
+        📈 Trends
       </button>
     </nav>
 
@@ -170,14 +262,14 @@
       <!-- Rate Cards -->
       <div class="rate-cards">
         <!-- Circle Rate Card -->
-        <div class="rate-card neutral" id="card-circle" aria-label="Government circle rate">
+        <div class="rate-card neutral glass-card reveal-card" id="card-circle" aria-label="Government circle rate">
           <div class="card-label">Govt. Circle Rate ₹/sqft</div>
           <div class="card-value" id="circle-rate-value">—</div>
           <div class="card-unit" id="circle-rate-zone">Select a zone to begin</div>
         </div>
 
         <!-- Market Rate Card -->
-        <div class="rate-card" id="card-market" aria-label="Estimated market rate">
+        <div class="rate-card glass-card reveal-card" id="card-market" aria-label="Estimated market rate">
           <div class="card-label">Est. Market Rate ₹/sqft</div>
           <div class="card-value" id="market-rate-value">—</div>
           <div class="card-unit" id="market-rate-risk">—</div>
@@ -185,7 +277,7 @@
       </div>
 
       <!-- Variance Gauge -->
-      <div class="gauge-card" aria-label="Variance and risk level">
+      <div class="gauge-card glass-card reveal-card" aria-label="Variance and risk level">
         <div class="gauge-header">
           <span class="gauge-title">Variance vs Circle Rate</span>
           <span class="risk-badge default" id="risk-badge" aria-live="polite" aria-atomic="true">—</span>
@@ -202,38 +294,59 @@
       </div>
 
       <!-- Insight Card -->
-      <div class="insight-card" id="insight-card" aria-live="polite" aria-atomic="true">
+      <div class="insight-card glass-card reveal-card" id="insight-card" aria-live="polite" aria-atomic="true">
         <span class="insight-icon" id="insight-icon" aria-hidden="true">💡</span>
         <p class="insight-text" id="insight-text">
           Select a city and zone, then adjust the sliders to generate a valuation. Results will appear here.
         </p>
       </div>
 
-      <!-- Breakdown -->
-      <div class="breakdown-card" id="breakdown-card">
-        <div class="breakdown-title">Valuation Breakdown</div>
-        <div class="breakdown-grid">
-          <div class="breakdown-item">
-            <span class="breakdown-item-label">Base (Circle × Mult.)</span>
-            <span class="breakdown-item-value" id="bd-base">—</span>
+      <!-- Breakdown + Sensitivity row -->
+      <div class="bottom-row">
+        <!-- Breakdown -->
+        <div class="breakdown-card glass-card reveal-card" id="breakdown-card">
+          <div class="breakdown-title">Valuation Breakdown</div>
+          <div class="breakdown-grid">
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Base (Circle × Mult.)</span>
+              <span class="breakdown-item-value" id="bd-base">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Metro Premium</span>
+              <span class="breakdown-item-value positive" id="bd-metro">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Age Depreciation</span>
+              <span class="breakdown-item-value negative" id="bd-depr">—</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="breakdown-item-label">Speculative Uplift</span>
+              <span class="breakdown-item-value positive" id="bd-spec">—</span>
+            </div>
           </div>
-          <div class="breakdown-item">
-            <span class="breakdown-item-label">Metro Premium</span>
-            <span class="breakdown-item-value positive" id="bd-metro">—</span>
+        </div>
+
+        <!-- Sensitivity Panel -->
+        <div class="sensitivity-card glass-card reveal-card" id="sensitivity-card">
+          <div class="sensitivity-header">
+            <div class="sensitivity-title">Sensitivity Analysis</div>
+            <div class="sensitivity-controls">
+              <select id="sensitivity-axis" class="sensitivity-select" aria-label="Select sensitivity axis">
+                <option value="speculation">Speculation Level</option>
+                <option value="age">Property Age</option>
+                <option value="metro">Metro Distance</option>
+              </select>
+            </div>
           </div>
-          <div class="breakdown-item">
-            <span class="breakdown-item-label">Age Depreciation</span>
-            <span class="breakdown-item-value negative" id="bd-depr">—</span>
+          <div class="sensitivity-chart-wrap">
+            <canvas id="sensitivity-chart" aria-label="Line chart showing how market value changes with the selected parameter"></canvas>
           </div>
-          <div class="breakdown-item">
-            <span class="breakdown-item-label">Speculative Uplift</span>
-            <span class="breakdown-item-value positive" id="bd-spec">—</span>
-          </div>
+          <div class="sensitivity-hint" id="sensitivity-hint">Run a valuation to enable sensitivity analysis.</div>
         </div>
       </div>
 
       <!-- Chart -->
-      <div class="chart-card">
+      <div class="chart-card glass-card reveal-card">
         <div class="chart-header">
           <span class="chart-title">Rate Comparison — ₹/sqft</span>
           <div class="chart-legend" aria-hidden="true">
@@ -276,8 +389,98 @@
       </div>
     </section>
 
+    <!-- ─── Tab: Compare Zones ─── -->
+    <section class="tab-panel" id="tab-compare" role="tabpanel" aria-labelledby="tab-btn-compare">
+      <div class="compare-header">
+        <div class="compare-title">Zone Comparison</div>
+        <p class="compare-subtitle">Pin up to 3 zones to compare them side-by-side.</p>
+      </div>
+
+      <!-- Zone picker -->
+      <div class="compare-picker glass-card">
+        <div class="compare-picker-row">
+          <div class="select-wrapper">
+            <select id="compare-city-select" aria-label="Select city to add zone">
+              <option value="">— Select City —</option>
+            </select>
+          </div>
+          <div class="select-wrapper">
+            <select id="compare-zone-select" aria-label="Select zone to pin" disabled>
+              <option value="">— Select Zone —</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="btn-pin-zone" aria-label="Pin zone for comparison" disabled>
+            + Pin Zone
+          </button>
+        </div>
+        <!-- Pinned zone chips -->
+        <div class="pinned-chips" id="pinned-chips" aria-label="Pinned zones" aria-live="polite"></div>
+      </div>
+
+      <!-- Comparison table -->
+      <div class="compare-table-wrap glass-card" id="compare-table-wrap">
+        <div class="compare-empty">Pin at least one zone above to start comparing.</div>
+      </div>
+
+      <!-- Radar chart -->
+      <div class="radar-card glass-card" id="radar-card">
+        <div class="chart-header">
+          <span class="chart-title">Multi-Factor Radar — Relative Scores</span>
+        </div>
+        <div class="radar-chart-wrap">
+          <canvas id="radar-chart" aria-label="Radar chart comparing multiple factors across pinned zones"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Tab: Trends ─── -->
+    <section class="tab-panel" id="tab-trends" role="tabpanel" aria-labelledby="tab-btn-trends">
+      <div class="trends-header">
+        <div class="trends-title">Historical Price Trends</div>
+        <p class="trends-subtitle" id="trends-subtitle">Select a zone in the Valuate tab to load 12-month trend data.</p>
+      </div>
+      <div class="trends-main glass-card" id="trends-main">
+        <div class="trends-empty" id="trends-empty">
+          <span aria-hidden="true">📊</span>
+          Run a valuation first to unlock trend analysis for a zone.
+        </div>
+        <div class="trends-chart-wrap" id="trends-chart-wrap" hidden>
+          <div class="trends-chart-header">
+            <div class="trends-legend" aria-hidden="true">
+              <span class="legend-dot" style="--dot-color: rgba(0,212,255,0.8)">Market Rate</span>
+              <span class="legend-dot" style="--dot-color: rgba(100,116,139,0.8)">Circle Rate</span>
+            </div>
+          </div>
+          <canvas id="trends-chart" aria-label="Line chart showing 12-month market and circle rate trend"></canvas>
+        </div>
+      </div>
+
+      <!-- Trend stats strip -->
+      <div class="trend-stats" id="trend-stats" hidden>
+        <div class="trend-stat glass-card">
+          <div class="trend-stat-label">12M Appreciation</div>
+          <div class="trend-stat-value" id="trend-appreciation">—</div>
+        </div>
+        <div class="trend-stat glass-card">
+          <div class="trend-stat-label">Peak Market Rate</div>
+          <div class="trend-stat-value" id="trend-peak">—</div>
+        </div>
+        <div class="trend-stat glass-card">
+          <div class="trend-stat-label">Trough Market Rate</div>
+          <div class="trend-stat-value" id="trend-trough">—</div>
+        </div>
+        <div class="trend-stat glass-card">
+          <div class="trend-stat-label">Avg Circle Rate</div>
+          <div class="trend-stat-value" id="trend-avg-circle">—</div>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script src="script.js" defer></script>
 </body>
