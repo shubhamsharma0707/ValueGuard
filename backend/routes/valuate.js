@@ -19,6 +19,21 @@ const locations = require('../data.json');
 const valuationHistory = [];
 
 /**
+ * Simulates real-time market fluctuations.
+ * Uses a deterministic pseudo-random seed based on the current minute.
+ * @param {number} baseValue
+ * @param {number} volatilityIndex
+ * @returns {number}
+ */
+function applyRealTimeFluctuation(baseValue, volatilityIndex) {
+  const now = new Date();
+  // Seed changes every minute so the user can see live updates
+  const seed = baseValue + now.getFullYear() + now.getMonth() + now.getDate() + now.getHours() + now.getMinutes();
+  const randomFactor = Math.sin(seed) * volatilityIndex;
+  return baseValue * (1 + randomFactor);
+}
+
+/**
  * Computes the metro proximity premium in ₹ per sqft.
  * @param {boolean} metroNearby - Whether a metro station is in the zone.
  * @param {number} distanceKm   - Distance from property to nearest metro (km).
@@ -97,10 +112,18 @@ function buildReasonText({ speculationLevel, metroDistanceKm, propertyAge, varia
 
 /**
  * GET /api/locations
- * Returns all 15 zone objects from data.json.
+ * Returns all zone objects from data.json with real-time fluctuated rates.
  */
 router.get('/locations', (req, res) => {
-  res.json(locations);
+  const realTimeLocations = locations.map(loc => {
+    const liveMultiplier = applyRealTimeFluctuation(loc.zone_multiplier, loc.volatility_index || 0.02);
+    return {
+      ...loc,
+      zone_multiplier: Number(liveMultiplier.toFixed(2)),
+      avg_market_rate_per_sqft: Math.round(loc.circle_rate_per_sqft * liveMultiplier)
+    };
+  });
+  res.json(realTimeLocations);
 });
 
 /**
@@ -129,12 +152,15 @@ router.post('/valuate', (req, res) => {
   const specLevel = Number(speculation_level) || 1;
 
   // --- Formula components ---
+  // Apply real-time fluctuation to the multiplier
+  const liveMultiplier = applyRealTimeFluctuation(location.zone_multiplier, location.volatility_index || 0.02);
+  
   const metroPremium = computeMetroPremium(location.metro_nearby, distanceKm);
   const ageDepreciation = computeAgeDepreciation(age);
   const speculativeUplift = computeSpeculativeUplift(specLevel);
 
   const marketValue = Math.round(
-    location.circle_rate_per_sqft * location.zone_multiplier
+    location.circle_rate_per_sqft * liveMultiplier
     + metroPremium
     - ageDepreciation
     + speculativeUplift
@@ -162,7 +188,7 @@ router.post('/valuate', (req, res) => {
     risk_level: riskLevel,
     reason_text: reasonText,
     breakdown: {
-      base: Math.round(location.circle_rate_per_sqft * location.zone_multiplier),
+      base: Math.round(location.circle_rate_per_sqft * liveMultiplier),
       metro_premium: metroPremium,
       age_depreciation: ageDepreciation,
       speculative_uplift: speculativeUplift,

@@ -7,7 +7,8 @@
     "avg_market_rate_per_sqft": 8200,
     "zone_multiplier": 1.42,
     "metro_nearby": true,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.015
   },
   {
     "id": "noida_sec18",
@@ -17,7 +18,8 @@
     "avg_market_rate_per_sqft": 9800,
     "zone_multiplier": 1.55,
     "metro_nearby": true,
-    "it_corridor": false
+    "it_corridor": false,
+    "volatility_index": 0.02
   },
   {
     "id": "blr_whitefield",
@@ -27,7 +29,8 @@
     "avg_market_rate_per_sqft": 11500,
     "zone_multiplier": 1.62,
     "metro_nearby": false,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.025
   },
   {
     "id": "blr_electronic_city",
@@ -37,7 +40,8 @@
     "avg_market_rate_per_sqft": 7800,
     "zone_multiplier": 1.48,
     "metro_nearby": false,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.012
   },
   {
     "id": "blr_sarjapur",
@@ -47,7 +51,8 @@
     "avg_market_rate_per_sqft": 9200,
     "zone_multiplier": 1.50,
     "metro_nearby": false,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.018
   },
   {
     "id": "pune_hinjewadi",
@@ -57,7 +62,8 @@
     "avg_market_rate_per_sqft": 8500,
     "zone_multiplier": 1.55,
     "metro_nearby": false,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.022
   },
   {
     "id": "pune_magarpatta",
@@ -67,7 +73,8 @@
     "avg_market_rate_per_sqft": 10200,
     "zone_multiplier": 1.48,
     "metro_nearby": true,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.019
   },
   {
     "id": "hyd_gachibowli",
@@ -77,7 +84,8 @@
     "avg_market_rate_per_sqft": 9600,
     "zone_multiplier": 1.58,
     "metro_nearby": true,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.021
   },
   {
     "id": "hyd_hitech_city",
@@ -87,7 +95,8 @@
     "avg_market_rate_per_sqft": 12800,
     "zone_multiplier": 1.72,
     "metro_nearby": true,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.028
   },
   {
     "id": "che_omr",
@@ -97,7 +106,8 @@
     "avg_market_rate_per_sqft": 7600,
     "zone_multiplier": 1.45,
     "metro_nearby": false,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.011
   },
   {
     "id": "che_sholinganallur",
@@ -107,7 +117,8 @@
     "avg_market_rate_per_sqft": 8100,
     "zone_multiplier": 1.50,
     "metro_nearby": false,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.015
   },
   {
     "id": "kol_salt_lake",
@@ -117,7 +128,8 @@
     "avg_market_rate_per_sqft": 6500,
     "zone_multiplier": 1.38,
     "metro_nearby": true,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.008
   },
   {
     "id": "kol_new_town",
@@ -127,7 +139,8 @@
     "avg_market_rate_per_sqft": 5900,
     "zone_multiplier": 1.35,
     "metro_nearby": false,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.009
   },
   {
     "id": "grg_cyber_city",
@@ -137,7 +150,8 @@
     "avg_market_rate_per_sqft": 16000,
     "zone_multiplier": 1.82,
     "metro_nearby": true,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.035
   },
   {
     "id": "grg_sohna_road",
@@ -147,6 +161,95 @@
     "avg_market_rate_per_sqft": 11200,
     "zone_multiplier": 1.60,
     "metro_nearby": false,
-    "it_corridor": true
+    "it_corridor": true,
+    "volatility_index": 0.02
+  },
+  {
+    "id": "mum_andheri_west",
+    "zone_name": "Andheri West Mumbai",
+    "city": "Mumbai",
+    "circle_rate_per_sqft": 18000,
+    "avg_market_rate_per_sqft": 32000,
+    "zone_multiplier": 1.70,
+    "metro_nearby": true,
+    "it_corridor": false,
+    "volatility_index": 0.025
+  },
+  {
+    "id": "mum_bkc",
+    "zone_name": "Bandra Kurla Complex",
+    "city": "Mumbai",
+    "circle_rate_per_sqft": 25000,
+    "avg_market_rate_per_sqft": 45000,
+    "zone_multiplier": 1.80,
+    "metro_nearby": true,
+    "it_corridor": true,
+    "volatility_index": 0.030
+  },
+  {
+    "id": "mum_navi_mumbai",
+    "zone_name": "Airoli Navi Mumbai",
+    "city": "Mumbai",
+    "circle_rate_per_sqft": 8500,
+    "avg_market_rate_per_sqft": 13000,
+    "zone_multiplier": 1.55,
+    "metro_nearby": false,
+    "it_corridor": true,
+    "volatility_index": 0.018
+  },
+  {
+    "id": "del_dwarka",
+    "zone_name": "Dwarka Delhi",
+    "city": "Delhi",
+    "circle_rate_per_sqft": 11000,
+    "avg_market_rate_per_sqft": 16500,
+    "zone_multiplier": 1.45,
+    "metro_nearby": true,
+    "it_corridor": false,
+    "volatility_index": 0.015
+  },
+  {
+    "id": "del_vasant_kunj",
+    "zone_name": "Vasant Kunj Delhi",
+    "city": "Delhi",
+    "circle_rate_per_sqft": 15000,
+    "avg_market_rate_per_sqft": 22000,
+    "zone_multiplier": 1.50,
+    "metro_nearby": true,
+    "it_corridor": false,
+    "volatility_index": 0.020
+  },
+  {
+    "id": "del_okhla",
+    "zone_name": "Okhla Phase 3 Delhi",
+    "city": "Delhi",
+    "circle_rate_per_sqft": 9000,
+    "avg_market_rate_per_sqft": 14000,
+    "zone_multiplier": 1.55,
+    "metro_nearby": true,
+    "it_corridor": true,
+    "volatility_index": 0.022
+  },
+  {
+    "id": "ahm_sg_highway",
+    "zone_name": "SG Highway Ahmedabad",
+    "city": "Ahmedabad",
+    "circle_rate_per_sqft": 4500,
+    "avg_market_rate_per_sqft": 7200,
+    "zone_multiplier": 1.60,
+    "metro_nearby": false,
+    "it_corridor": true,
+    "volatility_index": 0.019
+  },
+  {
+    "id": "ahm_gift_city",
+    "zone_name": "GIFT City Ahmedabad",
+    "city": "Ahmedabad",
+    "circle_rate_per_sqft": 5000,
+    "avg_market_rate_per_sqft": 8500,
+    "zone_multiplier": 1.75,
+    "metro_nearby": false,
+    "it_corridor": true,
+    "volatility_index": 0.035
   }
 ]
