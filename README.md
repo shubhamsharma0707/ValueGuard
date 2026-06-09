@@ -104,7 +104,7 @@ node backend/server.js
 ```
 Server starts at `http://localhost:3000`. You should see:
 ```
-✅ ValueGuard API running at http://localhost:3000
+ValueGuard running at http://localhost:3000
 ```
 
 ### 3. Open the frontend
@@ -159,7 +159,7 @@ npx live-server frontend/
 
 ## Features
 
-- **Dark financial terminal UI** — `#0b0f1a` base, JetBrains Mono, CSS custom properties
+- **Polished valuation dashboard UI** — light-first teal/blue palette, responsive cards, accessible controls
 - **Live slider readouts** — property age, metro distance, speculation factor
 - **Shimmer skeleton** — loading state during API fetch
 - **Animated variance gauge** — CSS transition, color-coded green/amber/red

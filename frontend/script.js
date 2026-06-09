@@ -24,7 +24,13 @@
    ============================================================ */
 
 /** @type {string} Base URL of the backend API */
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = (() => {
+  const isFile = window.location.protocol === 'file:';
+  const staticDevPorts = new Set(['5173', '5500', '8000', '8080']);
+  const isStaticDevServer = staticDevPorts.has(window.location.port);
+  if (!isFile && !isStaticDevServer) return `${window.location.origin}/api`;
+  return 'http://localhost:3000/api';
+})();
 
 /**
  * Global application state.
@@ -180,10 +186,10 @@ function riskClass(riskLevel) {
 }
 
 /** @param {'Safe'|'Caution'|'High Risk'} riskLevel @returns {string} */
-function riskIcon(riskLevel) {
-  if (riskLevel === 'Safe')    return '✅';
-  if (riskLevel === 'Caution') return '⚠️';
-  return '🚨';
+function riskIconClass(riskLevel) {
+  if (riskLevel === 'Safe')    return 'icon-check';
+  if (riskLevel === 'Caution') return 'icon-alert';
+  return 'icon-risk';
 }
 
 /** @param {number} val @returns {string} */
@@ -261,7 +267,7 @@ function updateClock() {
  * otherwise defaults to dark mode.
  */
 function initTheme() {
-  const saved = localStorage.getItem('vg-theme') || 'dark';
+  const saved = localStorage.getItem('vg-theme') || 'light';
   applyTheme(saved);
 }
 
@@ -270,12 +276,14 @@ function initTheme() {
  * @param {'dark'|'light'} theme
  */
 function applyTheme(theme) {
-  if (theme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    themeIcon.textContent = '🌙';
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeIcon.className = 'theme-icon icon-sun';
+    themeToggle.setAttribute('aria-label', 'Switch to light mode');
   } else {
     document.documentElement.removeAttribute('data-theme');
-    themeIcon.textContent = '☀️';
+    themeIcon.className = 'theme-icon icon-moon';
+    themeToggle.setAttribute('aria-label', 'Switch to dark mode');
   }
   localStorage.setItem('vg-theme', theme);
   // Refresh charts to pick up new colours
@@ -284,7 +292,7 @@ function applyTheme(theme) {
 }
 
 function toggleTheme() {
-  const current = localStorage.getItem('vg-theme') || 'dark';
+  const current = localStorage.getItem('vg-theme') || 'light';
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
@@ -404,7 +412,7 @@ async function fetchLocations() {
 
   } catch (err) {
     console.error('[ValueGuard] Failed to load locations:', err);
-    citySelect.innerHTML = '<option value="">⚠ Server Unavailable</option>';
+    citySelect.innerHTML = '<option value="">Server unavailable</option>';
     showError('Cannot reach the server at localhost:3000. Run: node backend/server.js');
   }
 }
@@ -577,7 +585,7 @@ function updateResults(data) {
   riskBadge.className   = `risk-badge ${cls}`;
 
   // Insight
-  insightIcon.textContent = riskIcon(data.risk_level);
+  insightIcon.className = `insight-icon ui-icon ${riskIconClass(data.risk_level)}`;
   insightText.textContent = data.reason_text;
   insightCard.className   = `insight-card glass-card reveal-card revealed ${cls}`;
 
@@ -655,8 +663,8 @@ function updateChart(data) {
       {
         label: 'Circle Rate',
         data: [data.circle_rate, avgCircle],
-        backgroundColor: 'rgba(0, 212, 255, 0.55)',
-        borderColor: 'rgba(0, 212, 255, 1)',
+        backgroundColor: 'rgba(15, 118, 110, 0.56)',
+        borderColor: 'rgba(15, 118, 110, 1)',
         borderWidth: 1,
         borderRadius: 5,
       },
@@ -689,7 +697,7 @@ function updateChart(data) {
  * @returns {Object}
  */
 function chartBaseOptions() {
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const isLight = document.documentElement.getAttribute('data-theme') !== 'dark';
   const gridClr = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
   const tickClr = isLight ? '#475569' : '#94a3b8';
   const tipBg   = isLight ? '#ffffff' : '#1a2235';
@@ -817,8 +825,8 @@ function renderHeatmap(city) {
       <td class="col-mono">₹${Number(loc.circle_rate_per_sqft).toLocaleString('en-IN')}</td>
       <td class="col-mono">₹${Number(loc.avg_market_rate_per_sqft).toLocaleString('en-IN')}</td>
       <td class="col-mono ${cls}">${variance > 0 ? '+' : ''}${variance}%</td>
-      <td>${loc.it_corridor ? '✓' : '—'}</td>
-      <td>${loc.metro_nearby ? '✓' : '—'}</td>
+      <td>${loc.it_corridor ? 'Yes' : 'No'}</td>
+      <td>${loc.metro_nearby ? 'Yes' : 'No'}</td>
       <td><span class="hm-badge ${cls}">${escapeHTML(risk)}</span></td>
     `;
     tbody.appendChild(tr);
@@ -887,8 +895,8 @@ function updateEMIChart(principal, interest) {
     labels: ['Principal', 'Total Interest'],
     datasets: [{
       data: [principal, interest],
-      backgroundColor: ['rgba(0,212,255,0.7)', 'rgba(239,68,68,0.6)'],
-      borderColor:     ['rgba(0,212,255,1)',   'rgba(239,68,68,1)'],
+      backgroundColor: ['rgba(15,118,110,0.72)', 'rgba(194,65,12,0.62)'],
+      borderColor:     ['rgba(15,118,110,1)',   'rgba(194,65,12,1)'],
       borderWidth: 1,
       hoverOffset: 4,
     }],
@@ -979,7 +987,7 @@ function updateSensitivityChart() {
     }
   }
 
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const isLight = document.documentElement.getAttribute('data-theme') !== 'dark';
   const gridClr = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)';
   const tickClr = isLight ? '#475569' : '#94a3b8';
 
@@ -988,15 +996,15 @@ function updateSensitivityChart() {
 
   // Gradient fill
   const grad = ctx.createLinearGradient(0, 0, 0, 120);
-  grad.addColorStop(0,   'rgba(0,212,255,0.3)');
-  grad.addColorStop(1,   'rgba(0,212,255,0)');
+  grad.addColorStop(0,   'rgba(15,118,110,0.26)');
+  grad.addColorStop(1,   'rgba(15,118,110,0)');
 
   const data = {
     labels,
     datasets: [{
       label: 'Market Value',
       data: values,
-      borderColor: 'rgba(0,212,255,0.9)',
+      borderColor: 'rgba(15,118,110,0.92)',
       backgroundColor: grad,
       borderWidth: 1.5,
       fill: true,
@@ -1080,7 +1088,7 @@ function pinZone() {
   renderPinnedChips();
   renderCompareTable();
   renderRadarChart();
-  showToast(`📌 Pinned ${loc.zone_name}`);
+  showToast(`Pinned ${loc.zone_name}`);
 }
 
 /**
@@ -1167,8 +1175,8 @@ function renderCompareTable() {
       <td style="color:${cls === 'safe' ? 'var(--clr-safe)' : cls === 'caution' ? 'var(--clr-caution)' : 'var(--clr-high)'}">₹${Number(z.market_value).toLocaleString('en-IN')}</td>
       <td class="col-mono ${cls}">${z.variance_pct > 0 ? '+' : ''}${z.variance_pct}%</td>
       <td>${z.zone_multiplier}×</td>
-      <td>${z.it_corridor ? '✓' : '—'}</td>
-      <td>${z.metro_nearby ? '✓' : '—'}</td>
+      <td>${z.it_corridor ? 'Yes' : 'No'}</td>
+      <td>${z.metro_nearby ? 'Yes' : 'No'}</td>
       <td><span class="hm-badge ${cls}">${escapeHTML(z.risk_level)}</span></td>
     `;
     tbody.appendChild(tr);
@@ -1189,9 +1197,9 @@ function renderRadarChart() {
   const spec    = Number(sliderSpeculation.value);
 
   const colours = [
-    { border: 'rgba(0,212,255,0.9)',   bg: 'rgba(0,212,255,0.12)' },
-    { border: 'rgba(99,102,241,0.9)',  bg: 'rgba(99,102,241,0.12)' },
-    { border: 'rgba(245,158,11,0.9)', bg: 'rgba(245,158,11,0.12)' },
+    { border: 'rgba(15,118,110,0.9)',  bg: 'rgba(15,118,110,0.12)' },
+    { border: 'rgba(3,105,161,0.9)',   bg: 'rgba(3,105,161,0.12)' },
+    { border: 'rgba(183,121,31,0.9)',  bg: 'rgba(183,121,31,0.12)' },
   ];
 
   // Normalise each factor to 0–100 relative to all locations
@@ -1223,7 +1231,7 @@ function renderRadarChart() {
     };
   });
 
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const isLight = document.documentElement.getAttribute('data-theme') !== 'dark';
   const gridClr = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)';
   const tickClr = isLight ? '#475569' : '#94a3b8';
 
@@ -1318,10 +1326,10 @@ function renderTrendsChart(data) {
 
   // Gradient fill for market rate
   const grad = ctx.createLinearGradient(0, 0, 0, 280);
-  grad.addColorStop(0, 'rgba(0,212,255,0.25)');
-  grad.addColorStop(1, 'rgba(0,212,255,0)');
+  grad.addColorStop(0, 'rgba(15,118,110,0.24)');
+  grad.addColorStop(1, 'rgba(15,118,110,0)');
 
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const isLight = document.documentElement.getAttribute('data-theme') !== 'dark';
   const gridClr = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
   const tickClr = isLight ? '#475569' : '#94a3b8';
 
@@ -1331,14 +1339,14 @@ function renderTrendsChart(data) {
       {
         label: 'Market Rate',
         data: mktVals,
-        borderColor: 'rgba(0,212,255,0.9)',
+        borderColor: 'rgba(15,118,110,0.92)',
         backgroundColor: grad,
         borderWidth: 2,
         fill: true,
         tension: 0.4,
         pointRadius: 3,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'rgba(0,212,255,1)',
+        pointBackgroundColor: 'rgba(15,118,110,1)',
       },
       {
         label: 'Circle Rate',
@@ -1455,7 +1463,7 @@ function exportCSV() {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-  showToast('✅ CSV exported successfully');
+  showToast('CSV exported successfully');
 }
 
 /**
@@ -1465,7 +1473,7 @@ async function copyShareURL() {
   encodeURLState();
   try {
     await navigator.clipboard.writeText(window.location.href);
-    showToast('🔗 Shareable link copied!');
+    showToast('Shareable link copied.');
   } catch {
     showToast('Copy failed — check clipboard permissions.');
   }

@@ -51,7 +51,7 @@
       <div class="topbar-time" id="topbar-clock" aria-live="polite" aria-atomic="true"></div>
       <!-- Theme toggle -->
       <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
-        <span class="theme-icon" id="theme-icon">☀️</span>
+        <span class="theme-icon" id="theme-icon" aria-hidden="true"></span>
       </button>
     </div>
   </header>
@@ -142,7 +142,7 @@
     <section class="sidebar-section emi-section" aria-labelledby="emi-section-title">
       <h2 class="sidebar-title" id="emi-section-title">
         <button class="collapsible-toggle" id="emi-toggle" aria-expanded="false" aria-controls="emi-body">
-          <span>🏦 EMI Calculator</span>
+          <span class="section-title-row"><span class="ui-icon icon-loan" aria-hidden="true"></span> EMI Calculator</span>
           <span class="drawer-chevron" aria-hidden="true">▾</span>
         </button>
       </h2>
@@ -194,20 +194,20 @@
       <h2 class="sidebar-title" id="actions-section-title">Export</h2>
       <div class="export-row">
         <button class="btn btn-ghost" id="btn-export-csv" aria-label="Export results as CSV file" title="Export CSV">
-          ⬇ CSV
+          <span class="ui-icon icon-download" aria-hidden="true"></span> CSV
         </button>
         <button class="btn btn-ghost" id="btn-copy-url" aria-label="Copy shareable link to clipboard" title="Copy Link">
-          🔗 Share
+          <span class="ui-icon icon-link" aria-hidden="true"></span> Share
         </button>
         <button class="btn btn-ghost" id="btn-print" aria-label="Print valuation report" title="Print Report">
-          🖨 Print
+          <span class="ui-icon icon-print" aria-hidden="true"></span> Print
         </button>
       </div>
     </section>
 
     <!-- Error Banner -->
     <div class="error-banner" id="error-banner" role="alert" aria-live="assertive">
-      <span>⚠</span>
+      <span class="ui-icon icon-alert" aria-hidden="true"></span>
       <span id="error-message">Unable to connect to server.</span>
     </div>
 
@@ -215,6 +215,27 @@
 
   <!-- ══════════════════════ MAIN CONTENT ══════════════════════ -->
   <main class="main-content" role="main" id="main-panel">
+    <section class="dashboard-brief" aria-labelledby="dashboard-title">
+      <div>
+        <p class="brief-kicker">Real estate valuation intelligence</p>
+        <h1 id="dashboard-title">Detect overpriced zones before the deal gets expensive.</h1>
+        <p class="brief-copy">Compare circle rates, estimated market value, infrastructure premiums, and speculation risk across Indian tech corridors.</p>
+      </div>
+      <div class="brief-metrics" aria-label="Product coverage">
+        <div class="brief-metric">
+          <span>15</span>
+          <small>tracked zones</small>
+        </div>
+        <div class="brief-metric">
+          <span>4</span>
+          <small>risk signals</small>
+        </div>
+        <div class="brief-metric">
+          <span>12M</span>
+          <small>trend view</small>
+        </div>
+      </div>
+    </section>
 
     <!-- Tab Bar -->
     <nav class="tab-bar" role="tablist" aria-label="Dashboard views">
@@ -225,7 +246,7 @@
         aria-selected="true"
         aria-controls="tab-valuate"
       >
-        ⚖ Valuate
+        <span class="ui-icon icon-scale" aria-hidden="true"></span> Valuate
       </button>
       <button
         class="tab-btn"
@@ -234,7 +255,7 @@
         aria-selected="false"
         aria-controls="tab-heatmap"
       >
-        🗺 Heatmap
+        <span class="ui-icon icon-grid" aria-hidden="true"></span> Heatmap
       </button>
       <button
         class="tab-btn"
@@ -243,7 +264,7 @@
         aria-selected="false"
         aria-controls="tab-compare"
       >
-        ⚡ Compare
+        <span class="ui-icon icon-compare" aria-hidden="true"></span> Compare
       </button>
       <button
         class="tab-btn"
@@ -252,7 +273,7 @@
         aria-selected="false"
         aria-controls="tab-trends"
       >
-        📈 Trends
+        <span class="ui-icon icon-trend" aria-hidden="true"></span> Trends
       </button>
     </nav>
 
@@ -295,7 +316,7 @@
 
       <!-- Insight Card -->
       <div class="insight-card glass-card reveal-card" id="insight-card" aria-live="polite" aria-atomic="true">
-        <span class="insight-icon" id="insight-icon" aria-hidden="true">💡</span>
+        <span class="insight-icon ui-icon icon-insight" id="insight-icon" aria-hidden="true"></span>
         <p class="insight-text" id="insight-text">
           Select a city and zone, then adjust the sliders to generate a valuation. Results will appear here.
         </p>
@@ -350,9 +371,9 @@
         <div class="chart-header">
           <span class="chart-title">Rate Comparison — ₹/sqft</span>
           <div class="chart-legend" aria-hidden="true">
-            <span class="legend-dot" style="--dot-color: rgba(0,212,255,0.7)">Circle Rate</span>
-            <span class="legend-dot" style="--dot-color: rgba(16,185,129,0.7)">Market Rate</span>
-            <span class="legend-dot" style="--dot-color: rgba(245,158,11,0.5)">City Avg</span>
+            <span class="legend-dot" style="--dot-color: rgba(15,118,110,0.72)">Circle Rate</span>
+            <span class="legend-dot" style="--dot-color: rgba(3,105,161,0.72)">Market Rate</span>
+            <span class="legend-dot" style="--dot-color: rgba(183,121,31,0.56)">City Avg</span>
           </div>
         </div>
         <div class="chart-container">
@@ -364,7 +385,8 @@
       <div class="history-drawer" id="history-drawer">
         <button class="drawer-toggle" id="drawer-toggle" aria-expanded="false" aria-controls="drawer-body">
           <span class="drawer-toggle-left">
-            <span>🕐 Last Queries</span>
+            <span class="ui-icon icon-history" aria-hidden="true"></span>
+            <span>Last Queries</span>
             <span class="drawer-count" id="drawer-count">0</span>
           </span>
           <span class="drawer-chevron" aria-hidden="true">▾</span>
@@ -441,13 +463,13 @@
       </div>
       <div class="trends-main glass-card" id="trends-main">
         <div class="trends-empty" id="trends-empty">
-          <span aria-hidden="true">📊</span>
+          <span class="empty-visual ui-icon icon-chart" aria-hidden="true"></span>
           Run a valuation first to unlock trend analysis for a zone.
         </div>
         <div class="trends-chart-wrap" id="trends-chart-wrap" hidden>
           <div class="trends-chart-header">
             <div class="trends-legend" aria-hidden="true">
-              <span class="legend-dot" style="--dot-color: rgba(0,212,255,0.8)">Market Rate</span>
+              <span class="legend-dot" style="--dot-color: rgba(15,118,110,0.82)">Market Rate</span>
               <span class="legend-dot" style="--dot-color: rgba(100,116,139,0.8)">Circle Rate</span>
             </div>
           </div>
