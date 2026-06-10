@@ -185,7 +185,7 @@ Simply open `http://localhost:3000` in your web browser.
 
 ![ValueGuard Dashboard](screenshot.png)
 
----
+----
 
 ## Locations in Database
 
@@ -207,7 +207,7 @@ Simply open `http://localhost:3000` in your web browser.
 | Cyber City Gurugram | Gurugram |
 | Sohna Road Gurugram | Gurugram |
 
----
+----
 
 ## License
 
