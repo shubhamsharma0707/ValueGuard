@@ -6,13 +6,14 @@
 
 ## What It Does
 
-ValueGuard is a property valuation dashboard for 6 Indian cities — Bengaluru, Hyderabad, Gurugram, Noida, Pune, and more. It:
+ValueGuard is a property valuation dashboard for 6 Indian cities — Bengaluru, Hyderabad, Gurugram, Noida, Pune, and Chennai. It:
 
 - Pulls government-registered circle rates for 15 tech corridor zones
 - Applies a multi-factor formula to estimate real market value
 - Flags speculative pricing with **Safe / Caution / High Risk** risk levels
-- Shows an animated variance gauge, live Chart.js comparison, city heatmap, and query history
-- Exports results to CSV and print-friendly report
+- Shows an animated variance gauge, live Chart.js comparison, historical trends, city heatmap, and query history
+- Exports results to CSV and a print-friendly report
+- Provides a built-in EMI / Loan Calculator to gauge affordability
 
 ---
 
@@ -70,11 +71,12 @@ Risk:  < 20% → Safe | 20–50% → Caution | > 50% → High Risk
 ## Project Structure
 
 ```
-value-guard/
+valueguard/
 ├── backend/
-│   ├── server.js           ← Express entry point
+│   ├── server.js           ← Express entry point & static file serving
 │   ├── routes/
-│   │   └── valuate.js      ← API routes + valuation logic
+│   │   ├── valuate.js      ← Valuation logic and API
+│   │   └── trends.js       ← Historical trend generation API
 │   ├── data.json           ← 15 Indian tech hub zones
 │   └── .env                ← PORT=3000
 ├── frontend/
@@ -82,7 +84,7 @@ value-guard/
 │   ├── style.css           ← Dark terminal design system
 │   ├── print.css           ← Print-friendly layout
 │   └── script.js           ← All JS (JSDoc'd, no frameworks)
-└── README.md
+└── package.json            ← Project metadata and scripts
 ```
 
 ---
@@ -98,22 +100,26 @@ value-guard/
 npm install
 ```
 
-### 2. Start the backend server
+### 2. Start the application
+The project comes with a built-in Express server that handles both the backend API and serves the frontend.
+
 ```bash
-node backend/server.js
+npm run dev
 ```
-Server starts at `http://localhost:3000`. You should see:
+
+Server starts at `http://localhost:3000`. You should see output like:
 ```
 ValueGuard running at http://localhost:3000
+   Endpoints:
+   GET  http://localhost:3000/api/locations
+   POST http://localhost:3000/api/valuate
+   GET  http://localhost:3000/api/history
+   GET  http://localhost:3000/api/trends/:location_id
 ```
 
 ### 3. Open the frontend
-Open `frontend/index.html` in your browser directly, or via live-server:
-```bash
-npx live-server frontend/
-```
-
-> No build step, no webpack, no bundler required.
+Simply open `http://localhost:3000` in your web browser. 
+> No build step, no webpack, no frontend bundler required. The backend statically serves the `frontend/` folder.
 
 ---
 
@@ -124,6 +130,7 @@ npx live-server frontend/
 | GET | `/api/locations` | Returns all 15 zone objects |
 | POST | `/api/valuate` | Computes and returns valuation result |
 | GET | `/api/history` | Returns last 5 session valuations |
+| GET | `/api/trends/:location_id` | Returns 12-month historical price trend data |
 
 ### POST /api/valuate — Request Body
 ```json
@@ -161,9 +168,10 @@ npx live-server frontend/
 
 - **Polished valuation dashboard UI** — light-first teal/blue palette, responsive cards, accessible controls
 - **Live slider readouts** — property age, metro distance, speculation factor
+- **EMI Calculator** — expandable loan affordability calculator with donut chart
 - **Shimmer skeleton** — loading state during API fetch
 - **Animated variance gauge** — CSS transition, color-coded green/amber/red
-- **Chart.js comparison** — selected zone vs city average, updates on every result
+- **Chart.js integrations** — comparison bar charts, multi-factor radar charts, and trend line charts
 - **City Heatmap tab** — all zones for selected city in a color-coded table
 - **Query history drawer** — last 5 valuations, collapsible
 - **Export CSV** — Blob download, no server needed
@@ -174,8 +182,6 @@ npx live-server frontend/
 ---
 
 ## Screenshot
-
-> _(Add screenshot here after first run)_
 
 ![ValueGuard Dashboard](screenshot.png)
 
