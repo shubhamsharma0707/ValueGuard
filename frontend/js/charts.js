@@ -2,12 +2,12 @@ import { state, charts } from './state.js';
 import { dom } from './dom.js';
 import { riskClass } from './utils.js';
 
-const ACCENT = 'rgba(212, 163, 115, 0.7)';
-const ACCENT_STRONG = 'rgba(212, 163, 115, 0.92)';
-const ACCENT_BORDER = 'rgba(212, 163, 115, 1)';
-const ACCENT_GRADIENT = 'rgba(212, 163, 115, 0.24)';
-const BLUE = 'rgba(10, 132, 255, 0.7)';
-const BLUE_BORDER = 'rgba(10, 132, 255, 1)';
+const ACCENT = 'rgba(255, 255, 255, 0.7)';
+const ACCENT_STRONG = 'rgba(255, 255, 255, 0.92)';
+const ACCENT_BORDER = 'rgba(255, 255, 255, 1)';
+const ACCENT_GRADIENT = 'rgba(255, 255, 255, 0.24)';
+const BLUE = 'rgba(128, 128, 128, 0.7)';
+const BLUE_BORDER = 'rgba(128, 128, 128, 1)';
 const GRAY = 'rgba(128, 128, 128, 0.5)';
 const GRAY_STRONG = 'rgba(128, 128, 128, 0.7)';
 
@@ -199,7 +199,7 @@ export function updateSensitivityChart() {
 
   const grad = ctx.createLinearGradient(0, 0, 0, 120);
   grad.addColorStop(0,   ACCENT_GRADIENT);
-  grad.addColorStop(1,   'rgba(212, 163, 115, 0)');
+  grad.addColorStop(1,   'rgba(255, 255, 255, 0)');
 
   const data = {
     labels,
@@ -257,9 +257,9 @@ export function renderRadarChart() {
   const spec    = Number(dom.sliderSpeculation.value);
 
   const colours = [
-    { border: ACCENT_BORDER,        bg: 'rgba(212, 163, 115, 0.12)' },
-    { border: 'rgba(10, 132, 255, 0.9)', bg: 'rgba(10, 132, 255, 0.12)' },
-    { border: 'rgba(255, 149, 0, 0.9)',  bg: 'rgba(255, 149, 0, 0.12)' },
+    { border: ACCENT_BORDER,        bg: 'rgba(255, 255, 255, 0.12)' },
+    { border: 'rgba(150, 150, 150, 0.9)', bg: 'rgba(150, 150, 150, 0.12)' },
+    { border: 'rgba(100, 100, 100, 0.9)',  bg: 'rgba(100, 100, 100, 0.12)' },
   ];
 
   const allLocs = state.locations;
@@ -339,7 +339,7 @@ export function renderTrendsChart(data) {
 
   const grad = ctx.createLinearGradient(0, 0, 0, 270);
   grad.addColorStop(0, ACCENT_GRADIENT);
-  grad.addColorStop(1, 'rgba(212, 163, 115, 0)');
+  grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
   const isDark = !document.documentElement.getAttribute('data-theme');
   const gridClr = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
