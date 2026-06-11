@@ -28,12 +28,7 @@ export function showSkeleton() {
   dom.marketRateRisk.textContent = '';
 }
 
-export function updateClock() {
-  const now = new Date();
-  dom.topbarClock.textContent = now.toLocaleTimeString('en-IN', {
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
-  });
-}
+
 
 export function initTheme() {
   const saved = localStorage.getItem('vg-theme') || 'light';

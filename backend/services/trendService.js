@@ -1,7 +1,8 @@
 /**
  * ValueGuard — Trend Service
- * Generates deterministic 12-month price trends for a given zone.
- * Uses a seeded pseudo-random walk based on the zone's properties.
+ * Generates deterministic 12-month projected price trends for a given zone.
+ * Uses a seeded pseudo-random walk based on the zone's properties
+ * to model expected price movement.
  *
  * @module services/trendService
  */

@@ -239,12 +239,6 @@ button:disabled {
   50% { opacity: 0.55; transform: scale(0.72); }
 }
 
-.topbar-time {
-  color: var(--clr-text-muted);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0;
-}
 
 .theme-toggle {
   width: 36px;
@@ -1734,13 +1728,8 @@ input[type=range]::-webkit-slider-thumb:hover {
     display: flex;
   }
 
-  .topbar-time {
-    display: none;
-  }
 
-  .live-badge span {
-    display: none;
-  }
+
 
   .app-shell {
     grid-template-columns: 1fr;

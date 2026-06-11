@@ -50,7 +50,6 @@ export const dom = {
   btnExportCSV:      document.getElementById('btn-export-csv'),
   btnCopyURL:        document.getElementById('btn-copy-url'),
   btnPrint:          document.getElementById('btn-print'),
-  topbarClock:       document.getElementById('topbar-clock'),
   printTimestamp:    document.getElementById('print-timestamp'),
 
   // Theme & mobile

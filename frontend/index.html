@@ -44,11 +44,10 @@
       </div>
     </div>
     <div class="topbar-meta">
-      <div class="live-badge" aria-label="API status: Live">
+      <div class="live-badge" aria-label="Data status">
         <div class="live-dot"></div>
-        <span>Live</span>
+        <span>Data: Apr 2025</span>
       </div>
-      <div class="topbar-time" id="topbar-clock" aria-live="polite" aria-atomic="true"></div>
       <!-- Theme toggle -->
       <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
         <span class="theme-icon" id="theme-icon" aria-hidden="true"></span>
@@ -458,13 +457,13 @@
     <!-- ─── Tab: Trends ─── -->
     <section class="tab-panel" id="tab-trends" role="tabpanel" aria-labelledby="tab-btn-trends">
       <div class="trends-header">
-        <div class="trends-title">Historical Price Trends</div>
-        <p class="trends-subtitle" id="trends-subtitle">Select a zone in the Valuate tab to load 12-month trend data.</p>
+        <div class="trends-title">Projected Price Trends</div>
+        <p class="trends-subtitle" id="trends-subtitle">Select a zone in the Valuate tab to load projected trend data.</p>
       </div>
       <div class="trends-main glass-card" id="trends-main">
         <div class="trends-empty" id="trends-empty">
           <span class="empty-visual ui-icon icon-chart" aria-hidden="true"></span>
-          Run a valuation first to unlock trend analysis for a zone.
+          Run a valuation first to unlock projected trend analysis for a zone.
         </div>
         <div class="trends-chart-wrap" id="trends-chart-wrap" hidden>
           <div class="trends-chart-header">
@@ -480,7 +479,7 @@
       <!-- Trend stats strip -->
       <div class="trend-stats" id="trend-stats" hidden>
         <div class="trend-stat glass-card">
-          <div class="trend-stat-label">12M Appreciation</div>
+          <div class="trend-stat-label">12M Projected Appreciation</div>
           <div class="trend-stat-value" id="trend-appreciation">—</div>
         </div>
         <div class="trend-stat glass-card">

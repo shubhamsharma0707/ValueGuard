@@ -7,21 +7,6 @@
 'use strict';
 
 /**
- * Simulates real-time market fluctuations.
- * Uses a deterministic pseudo-random seed based on the current minute.
- * @param {number} baseValue
- * @param {number} volatilityIndex
- * @returns {number}
- */
-function applyRealTimeFluctuation(baseValue, volatilityIndex) {
-  const now = new Date();
-  // Seed changes every minute so the user can see live updates
-  const seed = baseValue + now.getFullYear() + now.getMonth() + now.getDate() + now.getHours() + now.getMinutes();
-  const randomFactor = Math.sin(seed) * volatilityIndex;
-  return baseValue * (1 + randomFactor);
-}
-
-/**
  * Computes the metro proximity premium in ₹ per sqft.
  * @param {boolean} metroNearby - Whether a metro station is in the zone.
  * @param {number} distanceKm   - Distance from property to nearest metro (km).
@@ -99,7 +84,6 @@ function buildReasonText({ speculationLevel, metroDistanceKm, propertyAge, varia
 }
 
 module.exports = {
-  applyRealTimeFluctuation,
   computeMetroPremium,
   computeAgeDepreciation,
   computeSpeculativeUplift,

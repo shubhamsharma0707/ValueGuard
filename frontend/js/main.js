@@ -4,7 +4,7 @@ import { debounce, speculationLabel } from './utils.js';
 import { fetchLocationsAPI, submitValuationAPI, fetchHistoryAPI, fetchTrendsAPI } from './api.js';
 import { updateSensitivityChart, renderRadarChart, renderTrendsChart } from './charts.js';
 import {
-  showError, hideError, showSkeleton, updateClock, initTheme,
+  showError, hideError, showSkeleton, initTheme,
   toggleTheme, openSidebar, closeSidebar, filterZonesByCity,
   updateResults, resetResultCards, renderHistory, renderHeatmap,
   computeEMI, renderPinnedChips, renderCompareTable, renderTrendStats,
@@ -100,7 +100,7 @@ async function fetchTrends(locationId) {
     dom.trendsEmpty.hidden = false;
     dom.trendsChartWrap.hidden = true;
     dom.trendStats.hidden = true;
-    dom.trendsSubtitle.textContent = 'Select a zone in the Valuate tab to load 12-month trend data.';
+    dom.trendsSubtitle.textContent = 'Select a zone in the Valuate tab to load projected trend data.';
     return;
   }
 
@@ -109,7 +109,7 @@ async function fetchTrends(locationId) {
   try {
     const { zone_name, city, data } = await fetchTrendsAPI(locationId, specLevel);
 
-    dom.trendsSubtitle.textContent = `${zone_name}, ${city} — 12-Month Historical Trend (Simulated)`;
+    dom.trendsSubtitle.textContent = `${zone_name}, ${city} — 12-Month Projected Trend`;
     dom.trendsEmpty.hidden     = true;
     dom.trendsChartWrap.hidden = false;
     dom.trendStats.hidden      = false;
@@ -340,8 +340,6 @@ function initEventListeners() {
 }
 
 async function init() {
-  updateClock();
-  setInterval(updateClock, 1000);
   initTheme();
   initRevealAnimations();
   initTabs();

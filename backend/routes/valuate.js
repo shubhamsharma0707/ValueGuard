@@ -10,7 +10,6 @@ const express = require('express');
 const router = express.Router();
 const locations = require('../data.json');
 const {
-  applyRealTimeFluctuation,
   computeMetroPremium,
   computeAgeDepreciation,
   computeSpeculativeUplift,
@@ -28,18 +27,10 @@ const valuationHistory = [];
 
 /**
  * GET /api/locations
- * Returns all zone objects from data.json with real-time fluctuated rates.
+ * Returns all zone objects from data.json with real rates.
  */
 router.get('/locations', (req, res) => {
-  const realTimeLocations = locations.map(loc => {
-    const liveMultiplier = applyRealTimeFluctuation(loc.zone_multiplier, loc.volatility_index || 0.02);
-    return {
-      ...loc,
-      zone_multiplier: Number(liveMultiplier.toFixed(2)),
-      avg_market_rate_per_sqft: Math.round(loc.circle_rate_per_sqft * liveMultiplier)
-    };
-  });
-  res.json(realTimeLocations);
+  res.json(locations);
 });
 
 /**
@@ -68,15 +59,13 @@ router.post('/valuate', (req, res) => {
   const specLevel = Number(speculation_level) || 1;
 
   // --- Formula components ---
-  // Apply real-time fluctuation to the multiplier
-  const liveMultiplier = applyRealTimeFluctuation(location.zone_multiplier, location.volatility_index || 0.02);
-  
+  // Use real zone_multiplier directly from curated data
   const metroPremium = computeMetroPremium(location.metro_nearby, distanceKm);
   const ageDepreciation = computeAgeDepreciation(age);
   const speculativeUplift = computeSpeculativeUplift(specLevel);
 
   const marketValue = Math.round(
-    location.circle_rate_per_sqft * liveMultiplier
+    location.circle_rate_per_sqft * location.zone_multiplier
     + metroPremium
     - ageDepreciation
     + speculativeUplift
@@ -104,11 +93,13 @@ router.post('/valuate', (req, res) => {
     risk_level: riskLevel,
     reason_text: reasonText,
     breakdown: {
-      base: Math.round(location.circle_rate_per_sqft * liveMultiplier),
+      base: Math.round(location.circle_rate_per_sqft * location.zone_multiplier),
       metro_premium: metroPremium,
       age_depreciation: ageDepreciation,
       speculative_uplift: speculativeUplift,
     },
+    data_source: location.data_source,
+    last_updated: location.last_updated,
     timestamp: new Date().toISOString(),
   };
 
