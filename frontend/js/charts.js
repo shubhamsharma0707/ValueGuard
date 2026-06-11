@@ -2,6 +2,15 @@ import { state, charts } from './state.js';
 import { dom } from './dom.js';
 import { riskClass } from './utils.js';
 
+const ACCENT = 'rgba(212, 163, 115, 0.7)';
+const ACCENT_STRONG = 'rgba(212, 163, 115, 0.92)';
+const ACCENT_BORDER = 'rgba(212, 163, 115, 1)';
+const ACCENT_GRADIENT = 'rgba(212, 163, 115, 0.24)';
+const BLUE = 'rgba(10, 132, 255, 0.7)';
+const BLUE_BORDER = 'rgba(10, 132, 255, 1)';
+const GRAY = 'rgba(128, 128, 128, 0.5)';
+const GRAY_STRONG = 'rgba(128, 128, 128, 0.7)';
+
 function computeCityAverages(city) {
   const zones = state.locations.filter((l) => l.city === city);
   if (!zones.length) return { avgCircle: 0, avgMarket: 0 };
@@ -11,16 +20,17 @@ function computeCityAverages(city) {
 }
 
 function riskBarColor(riskLevel, alpha) {
-  if (riskLevel === 'Safe')    return `rgba(16, 185, 129, ${alpha})`;
-  if (riskLevel === 'Caution') return `rgba(245, 158, 11, ${alpha})`;
-  return `rgba(239, 68, 68, ${alpha})`;
+  if (riskLevel === 'Safe')    return `rgba(76, 217, 100, ${alpha})`;
+  if (riskLevel === 'Caution') return `rgba(255, 149, 0, ${alpha})`;
+  return `rgba(255, 69, 58, ${alpha})`;
 }
 
 function chartBaseOptions() {
-  const isLight = document.documentElement.getAttribute('data-theme') !== 'dark';
-  const gridClr = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
-  const tickClr = isLight ? '#475569' : '#94a3b8';
-  const tipBg   = isLight ? '#ffffff' : '#1a2235';
+  const isDark = !document.documentElement.getAttribute('data-theme');
+  const gridClr = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const tickClr = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)';
+  const tipBg   = isDark ? '#1d1d29' : '#ffffff';
+  const tipBody = isDark ? '#e2e2e2' : '#1e293b';
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -28,10 +38,10 @@ function chartBaseOptions() {
       legend: { display: false },
       tooltip: {
         backgroundColor: tipBg,
-        borderColor: 'rgba(255,255,255,0.08)',
+        borderColor: 'rgba(255,255,255,0.06)',
         borderWidth: 1,
-        titleColor: '#94a3b8',
-        bodyColor: isLight ? '#1e293b' : '#e2e8f0',
+        titleColor: tickClr,
+        bodyColor: tipBody,
         callbacks: {
           label: (ctx) => ` ${ctx.dataset.label}: ₹${Number(ctx.raw).toLocaleString('en-IN')}/sqft`,
         },
@@ -63,10 +73,10 @@ export function updateChart(data) {
       {
         label: 'Circle Rate',
         data: [data.circle_rate, avgCircle],
-        backgroundColor: 'rgba(15, 118, 110, 0.56)',
-        borderColor: 'rgba(15, 118, 110, 1)',
+        backgroundColor: ACCENT,
+        borderColor: ACCENT_BORDER,
         borderWidth: 1,
-        borderRadius: 5,
+        borderRadius: 4,
       },
       {
         label: 'Market Rate',
@@ -74,7 +84,7 @@ export function updateChart(data) {
         backgroundColor: riskBarColor(data.risk_level, 0.55),
         borderColor:     riskBarColor(data.risk_level, 1),
         borderWidth: 1,
-        borderRadius: 5,
+        borderRadius: 4,
       },
     ],
   };
@@ -96,12 +106,15 @@ export function updateEMIChart(principal, interest) {
   const canvas = document.getElementById('emi-chart');
   const ctx    = canvas.getContext('2d');
 
+  const isDark = !document.documentElement.getAttribute('data-theme');
+  const labelClr = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+
   const data = {
     labels: ['Principal', 'Total Interest'],
     datasets: [{
       data: [principal, interest],
-      backgroundColor: ['rgba(15,118,110,0.72)', 'rgba(194,65,12,0.62)'],
-      borderColor:     ['rgba(15,118,110,1)',   'rgba(194,65,12,1)'],
+      backgroundColor: [ACCENT_STRONG, 'rgba(255, 69, 58, 0.55)'],
+      borderColor:     [ACCENT_BORDER,  'rgba(255, 69, 58, 1)'],
       borderWidth: 1,
       hoverOffset: 4,
     }],
@@ -121,7 +134,7 @@ export function updateEMIChart(principal, interest) {
         plugins: {
           legend: {
             position: 'right',
-            labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 10 },
+            labels: { color: labelClr, font: { size: 10 }, boxWidth: 10 },
           },
           tooltip: {
             callbacks: {
@@ -177,23 +190,23 @@ export function updateSensitivityChart() {
     }
   }
 
-  const isLight = document.documentElement.getAttribute('data-theme') !== 'dark';
-  const gridClr = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)';
-  const tickClr = isLight ? '#475569' : '#94a3b8';
+  const isDark = !document.documentElement.getAttribute('data-theme');
+  const gridClr = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const tickClr = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)';
 
   const canvas = document.getElementById('sensitivity-chart');
   const ctx    = canvas.getContext('2d');
 
   const grad = ctx.createLinearGradient(0, 0, 0, 120);
-  grad.addColorStop(0,   'rgba(15,118,110,0.26)');
-  grad.addColorStop(1,   'rgba(15,118,110,0)');
+  grad.addColorStop(0,   ACCENT_GRADIENT);
+  grad.addColorStop(1,   'rgba(212, 163, 115, 0)');
 
   const data = {
     labels,
     datasets: [{
       label: 'Market Value',
       data: values,
-      borderColor: 'rgba(15,118,110,0.92)',
+      borderColor: ACCENT_STRONG,
       backgroundColor: grad,
       borderWidth: 1.5,
       fill: true,
@@ -244,9 +257,9 @@ export function renderRadarChart() {
   const spec    = Number(dom.sliderSpeculation.value);
 
   const colours = [
-    { border: 'rgba(15,118,110,0.9)',  bg: 'rgba(15,118,110,0.12)' },
-    { border: 'rgba(3,105,161,0.9)',   bg: 'rgba(3,105,161,0.12)' },
-    { border: 'rgba(183,121,31,0.9)',  bg: 'rgba(183,121,31,0.12)' },
+    { border: ACCENT_BORDER,        bg: 'rgba(212, 163, 115, 0.12)' },
+    { border: 'rgba(10, 132, 255, 0.9)', bg: 'rgba(10, 132, 255, 0.12)' },
+    { border: 'rgba(255, 149, 0, 0.9)',  bg: 'rgba(255, 149, 0, 0.12)' },
   ];
 
   const allLocs = state.locations;
@@ -277,9 +290,9 @@ export function renderRadarChart() {
     };
   });
 
-  const isLight = document.documentElement.getAttribute('data-theme') !== 'dark';
-  const gridClr = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)';
-  const tickClr = isLight ? '#475569' : '#94a3b8';
+  const isDark = !document.documentElement.getAttribute('data-theme');
+  const gridClr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  const tickClr = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
 
   const canvas = document.getElementById('radar-chart');
   if (charts.radarChart) {
@@ -324,13 +337,13 @@ export function renderTrendsChart(data) {
   const canvas = document.getElementById('trends-chart');
   const ctx    = canvas.getContext('2d');
 
-  const grad = ctx.createLinearGradient(0, 0, 0, 280);
-  grad.addColorStop(0, 'rgba(15,118,110,0.24)');
-  grad.addColorStop(1, 'rgba(15,118,110,0)');
+  const grad = ctx.createLinearGradient(0, 0, 0, 270);
+  grad.addColorStop(0, ACCENT_GRADIENT);
+  grad.addColorStop(1, 'rgba(212, 163, 115, 0)');
 
-  const isLight = document.documentElement.getAttribute('data-theme') !== 'dark';
-  const gridClr = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
-  const tickClr = isLight ? '#475569' : '#94a3b8';
+  const isDark = !document.documentElement.getAttribute('data-theme');
+  const gridClr = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const tickClr = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)';
 
   const chartData = {
     labels,
@@ -338,19 +351,19 @@ export function renderTrendsChart(data) {
       {
         label: 'Market Rate',
         data: mktVals,
-        borderColor: 'rgba(15,118,110,0.92)',
+        borderColor: ACCENT_STRONG,
         backgroundColor: grad,
         borderWidth: 2,
         fill: true,
         tension: 0.4,
         pointRadius: 3,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'rgba(15,118,110,1)',
+        pointBackgroundColor: ACCENT_BORDER,
       },
       {
         label: 'Circle Rate',
         data: cirVals,
-        borderColor: 'rgba(100,116,139,0.7)',
+        borderColor: GRAY_STRONG,
         backgroundColor: 'transparent',
         borderWidth: 1.5,
         borderDash: [4, 4],
@@ -358,7 +371,7 @@ export function renderTrendsChart(data) {
         tension: 0.4,
         pointRadius: 2,
         pointHoverRadius: 4,
-        pointBackgroundColor: 'rgba(100,116,139,1)',
+        pointBackgroundColor: GRAY_STRONG,
       },
     ],
   };
@@ -379,11 +392,11 @@ export function renderTrendsChart(data) {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: isLight ? '#fff' : '#1a2235',
-          borderColor: 'rgba(255,255,255,0.08)',
+          backgroundColor: isDark ? '#1d1d29' : '#fff',
+          borderColor: 'rgba(255,255,255,0.06)',
           borderWidth: 1,
           titleColor: tickClr,
-          bodyColor:  isLight ? '#1e293b' : '#e2e8f0',
+          bodyColor:  isDark ? '#e2e2e2' : '#1e293b',
           callbacks: {
             label: (ctx) => ` ${ctx.dataset.label}: ₹${Number(ctx.raw).toLocaleString('en-IN')}/sqft`,
           },

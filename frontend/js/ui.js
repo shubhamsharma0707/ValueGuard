@@ -1,9 +1,16 @@
 import { dom } from './dom.js';
 import { state } from './state.js';
-import { formatINR, riskClass, riskIconClass, escapeHTML, speculationLabel } from './utils.js';
+import { formatINR, riskClass, escapeHTML, speculationLabel, iconSVG, riskIconSVG } from './utils.js';
 import { updateChart, updateEMIChart, renderRadarChart } from './charts.js';
 
 let toastTimer;
+
+export function initIcons() {
+  document.querySelectorAll('[data-icon]').forEach((el) => {
+    const name = el.getAttribute('data-icon');
+    el.innerHTML = iconSVG(name);
+  });
+}
 
 export function showToast(message, duration = 2500) {
   clearTimeout(toastTimer);
@@ -28,30 +35,27 @@ export function showSkeleton() {
   dom.marketRateRisk.textContent = '';
 }
 
-
-
 export function initTheme() {
-  const saved = localStorage.getItem('vg-theme') || 'light';
+  const saved = localStorage.getItem('vg-theme') || 'dark';
   applyTheme(saved);
 }
 
 export function applyTheme(theme) {
-  if (theme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    dom.themeIcon.className = 'theme-icon icon-sun';
-    dom.themeToggle.setAttribute('aria-label', 'Switch to light mode');
+  if (theme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    dom.themeIcon.innerHTML = iconSVG('sun');
+    dom.themeToggle.setAttribute('aria-label', 'Switch to dark mode');
   } else {
     document.documentElement.removeAttribute('data-theme');
-    dom.themeIcon.className = 'theme-icon icon-moon';
-    dom.themeToggle.setAttribute('aria-label', 'Switch to dark mode');
+    dom.themeIcon.innerHTML = iconSVG('moon');
+    dom.themeToggle.setAttribute('aria-label', 'Switch to light mode');
   }
   localStorage.setItem('vg-theme', theme);
-  // Dispatch event to allow charts to re-render
   window.dispatchEvent(new Event('themeChanged'));
 }
 
 export function toggleTheme() {
-  const current = localStorage.getItem('vg-theme') || 'light';
+  const current = localStorage.getItem('vg-theme') || 'dark';
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
@@ -78,7 +82,7 @@ export function animateNumber(el, target, prefix = '', duration = 400) {
 
   function step(now) {
     const progress = Math.min((now - start) / duration, 1);
-    const eased    = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const eased    = 1 - Math.pow(1 - progress, 3);
     const current  = Math.round(startVal + (target - startVal) * eased);
     el.textContent = prefix + Number(current).toLocaleString('en-IN');
     if (progress < 1) requestAnimationFrame(step);
@@ -128,7 +132,7 @@ export function updateResults(data) {
   dom.riskBadge.textContent = data.risk_level;
   dom.riskBadge.className   = `risk-badge ${cls}`;
 
-  dom.insightIcon.className = `insight-icon ui-icon ${riskIconClass(data.risk_level)}`;
+  dom.insightIcon.innerHTML = riskIconSVG(data.risk_level);
   dom.insightText.textContent = data.reason_text;
   dom.insightCard.className   = `insight-card glass-card reveal-card revealed ${cls}`;
 
@@ -159,7 +163,6 @@ function updateGauge(variancePct, cls) {
   const displayWidth = Math.min(Math.abs(variancePct), 100);
   requestAnimationFrame(() => {
     dom.gaugeFill.style.width = `${displayWidth}%`;
-    dom.gaugeFill.textContent  = `${variancePct}%`;
     dom.gaugeFill.className    = `gauge-fill ${cls}`;
   });
 }
@@ -174,14 +177,14 @@ export function renderHistory(history) {
   history.forEach((item) => {
     const cls = riskClass(item.risk_level);
     const div = document.createElement('div');
-    div.className = 'history-item fade-in';
+    div.className = 'history-item';
     div.innerHTML = `
       <div>
         <div class="history-zone">${escapeHTML(item.zone_name)}</div>
         <div class="history-city text-muted">${escapeHTML(item.city)}</div>
       </div>
       <div class="history-rate">₹${Number(item.market_value).toLocaleString('en-IN')}/sqft</div>
-      <div class="history-variance ${cls}" style="font-family:var(--font-mono);font-size:0.75rem">
+      <div class="history-variance ${cls}" style="font-family:var(--font-mono);font-size:0.72rem">
         ${item.variance_pct > 0 ? '+' : ''}${item.variance_pct}%
       </div>
       <span class="history-badge hm-badge ${cls}">${escapeHTML(item.risk_level)}</span>
@@ -295,7 +298,7 @@ function formulaEstimate(loc, age, metroKm, specLevel) {
 export function renderPinnedChips(unpinZoneCallback) {
   dom.pinnedChips.innerHTML = '';
   if (!state.pinnedZones.length) {
-    dom.pinnedChips.innerHTML = '<span style="font-size:0.72rem;color:var(--clr-text-dim)">No zones pinned yet</span>';
+    dom.pinnedChips.innerHTML = '<span style="font-size:0.7rem;color:var(--clr-text-quaternary)">No zones pinned yet</span>';
     return;
   }
   state.pinnedZones.forEach((z) => {
@@ -308,7 +311,7 @@ export function renderPinnedChips(unpinZoneCallback) {
     
     const btn = document.createElement('button');
     btn.setAttribute('aria-label', `Unpin ${z.zone_name}`);
-    btn.textContent = '✕';
+    btn.innerHTML = iconSVG('xmark');
     btn.addEventListener('click', () => unpinZoneCallback(z.id));
     
     chip.appendChild(span);
@@ -360,9 +363,9 @@ export function renderCompareTable() {
     const tr  = document.createElement('tr');
     tr.innerHTML = `
       <td>${escapeHTML(z.zone_name)}</td>
-      <td style="color:var(--clr-text-muted)">${escapeHTML(z.city)}</td>
+      <td style="color:var(--clr-text-tertiary)">${escapeHTML(z.city)}</td>
       <td>₹${Number(z.circle_rate_per_sqft).toLocaleString('en-IN')}</td>
-      <td style="color:${cls === 'safe' ? 'var(--clr-safe)' : cls === 'caution' ? 'var(--clr-caution)' : 'var(--clr-high)'}">₹${Number(z.market_value).toLocaleString('en-IN')}</td>
+      <td style="color:${cls === 'safe' ? 'var(--clr-green)' : cls === 'caution' ? 'var(--clr-orange)' : 'var(--clr-red)'}">₹${Number(z.market_value).toLocaleString('en-IN')}</td>
       <td class="col-mono ${cls}">${z.variance_pct > 0 ? '+' : ''}${z.variance_pct}%</td>
       <td>${z.zone_multiplier}×</td>
       <td>${z.it_corridor ? 'Yes' : 'No'}</td>
@@ -388,7 +391,7 @@ export function renderTrendStats(data, zoneName) {
   const avgCircle   = Math.round(cirVals.reduce((a, b) => a + b, 0) / cirVals.length);
 
   dom.trendAppreciation.textContent = `${appreciation > 0 ? '+' : ''}${appreciation}%`;
-  dom.trendAppreciation.style.color = appreciation >= 0 ? 'var(--clr-safe)' : 'var(--clr-high)';
+  dom.trendAppreciation.style.color = appreciation >= 0 ? 'var(--clr-green)' : 'var(--clr-red)';
   dom.trendPeak.textContent         = formatINR(peak) + '/sqft';
   dom.trendTrough.textContent       = formatINR(trough) + '/sqft';
   dom.trendAvgCircle.textContent    = formatINR(avgCircle) + '/sqft';

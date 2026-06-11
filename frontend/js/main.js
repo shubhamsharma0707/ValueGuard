@@ -4,7 +4,7 @@ import { debounce, speculationLabel } from './utils.js';
 import { fetchLocationsAPI, submitValuationAPI, fetchHistoryAPI, fetchTrendsAPI } from './api.js';
 import { updateSensitivityChart, renderRadarChart, renderTrendsChart } from './charts.js';
 import {
-  showError, hideError, showSkeleton, initTheme,
+  showError, hideError, showSkeleton, initTheme, initIcons,
   toggleTheme, openSidebar, closeSidebar, filterZonesByCity,
   updateResults, resetResultCards, renderHistory, renderHeatmap,
   computeEMI, renderPinnedChips, renderCompareTable, renderTrendStats,
@@ -66,6 +66,7 @@ function applyURLParams() {
   const spec   = params.get('spec');
 
   if (city && dom.citySelect.querySelector(`option[value="${CSS.escape(city)}"]`)) {
+
     dom.citySelect.value = city;
     filterZonesByCity(city, dom.zoneSelect);
     renderHeatmap(city);
@@ -247,23 +248,41 @@ function initTabs() {
   });
 }
 
+function updateSliderFill(el) {
+  const min = Number(el.min);
+  const max = Number(el.max);
+  const val = Number(el.value);
+  const pct = ((val - min) / (max - min)) * 100;
+  el.style.background = `linear-gradient(to right, var(--clr-accent) ${pct}%, var(--clr-surface-3) ${pct}%)`;
+}
+
 function initSliderReadouts() {
   dom.sliderAge.addEventListener('input', () => {
     const v = dom.sliderAge.value;
     dom.valAge.textContent = `${v} yr${v === '1' ? '' : 's'}`;
     dom.sliderAge.setAttribute('aria-valuenow', v);
+    updateSliderFill(dom.sliderAge);
   });
 
   dom.sliderMetro.addEventListener('input', () => {
     const v = Number(dom.sliderMetro.value).toFixed(1);
     dom.valMetro.textContent = `${v} km`;
     dom.sliderMetro.setAttribute('aria-valuenow', v);
+    updateSliderFill(dom.sliderMetro);
   });
 
   dom.sliderSpeculation.addEventListener('input', () => {
     const v = dom.sliderSpeculation.value;
     dom.valSpeculation.textContent = speculationLabel(Number(v));
     dom.sliderSpeculation.setAttribute('aria-valuenow', v);
+    updateSliderFill(dom.sliderSpeculation);
+  });
+
+  // Initialize fills on page load
+  requestAnimationFrame(() => {
+    updateSliderFill(dom.sliderAge);
+    updateSliderFill(dom.sliderMetro);
+    updateSliderFill(dom.sliderSpeculation);
   });
 }
 
@@ -341,6 +360,7 @@ function initEventListeners() {
 
 async function init() {
   initTheme();
+  initIcons();
   initRevealAnimations();
   initTabs();
   initSliderReadouts();

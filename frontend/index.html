@@ -39,7 +39,6 @@
         <span class="hamburger-line"></span>
       </button>
       <div class="topbar-brand">
-        <div class="brand-icon" aria-hidden="true"></div>
         <span class="brand-name">Value<span>Guard</span></span>
       </div>
     </div>
@@ -141,8 +140,8 @@
     <section class="sidebar-section emi-section" aria-labelledby="emi-section-title">
       <h2 class="sidebar-title" id="emi-section-title">
         <button class="collapsible-toggle" id="emi-toggle" aria-expanded="false" aria-controls="emi-body">
-          <span class="section-title-row"><span class="ui-icon icon-loan" aria-hidden="true"></span> EMI Calculator</span>
-          <span class="drawer-chevron" aria-hidden="true">▾</span>
+          <span class="section-title-row"><span class="ui-icon" data-icon="loan" aria-hidden="true"></span> EMI Calculator</span>
+          <span class="drawer-chevron" data-icon="chevron" aria-hidden="true"></span>
         </button>
       </h2>
       <div class="emi-body" id="emi-body" hidden>
@@ -188,25 +187,25 @@
       </div>
     </section>
 
-    <!-- Actions -->
+    <!-- Actions — macOS Toolbar style -->
     <section class="sidebar-section" aria-labelledby="actions-section-title">
       <h2 class="sidebar-title" id="actions-section-title">Export</h2>
       <div class="export-row">
-        <button class="btn btn-ghost" id="btn-export-csv" aria-label="Export results as CSV file" title="Export CSV">
-          <span class="ui-icon icon-download" aria-hidden="true"></span> CSV
+        <button class="btn-toolbar" id="btn-export-csv" data-tip="Export CSV" aria-label="Export results as CSV file">
+          <span class="ui-icon" data-icon="download" aria-hidden="true"></span>
         </button>
-        <button class="btn btn-ghost" id="btn-copy-url" aria-label="Copy shareable link to clipboard" title="Copy Link">
-          <span class="ui-icon icon-link" aria-hidden="true"></span> Share
+        <button class="btn-toolbar" id="btn-copy-url" data-tip="Copy Link" aria-label="Copy shareable link to clipboard">
+          <span class="ui-icon" data-icon="link" aria-hidden="true"></span>
         </button>
-        <button class="btn btn-ghost" id="btn-print" aria-label="Print valuation report" title="Print Report">
-          <span class="ui-icon icon-print" aria-hidden="true"></span> Print
+        <button class="btn-toolbar" id="btn-print" data-tip="Print Report" aria-label="Print valuation report">
+          <span class="ui-icon" data-icon="print" aria-hidden="true"></span>
         </button>
       </div>
     </section>
 
     <!-- Error Banner -->
     <div class="error-banner" id="error-banner" role="alert" aria-live="assertive">
-      <span class="ui-icon icon-alert" aria-hidden="true"></span>
+      <span class="ui-icon" data-icon="alert" aria-hidden="true"></span>
       <span id="error-message">Unable to connect to server.</span>
     </div>
 
@@ -245,7 +244,7 @@
         aria-selected="true"
         aria-controls="tab-valuate"
       >
-        <span class="ui-icon icon-scale" aria-hidden="true"></span> Valuate
+        <span class="ui-icon" data-icon="scale" aria-hidden="true"></span> Valuate
       </button>
       <button
         class="tab-btn"
@@ -254,7 +253,7 @@
         aria-selected="false"
         aria-controls="tab-heatmap"
       >
-        <span class="ui-icon icon-grid" aria-hidden="true"></span> Heatmap
+        <span class="ui-icon" data-icon="grid" aria-hidden="true"></span> Heatmap
       </button>
       <button
         class="tab-btn"
@@ -263,7 +262,7 @@
         aria-selected="false"
         aria-controls="tab-compare"
       >
-        <span class="ui-icon icon-compare" aria-hidden="true"></span> Compare
+        <span class="ui-icon" data-icon="compare" aria-hidden="true"></span> Compare
       </button>
       <button
         class="tab-btn"
@@ -272,7 +271,7 @@
         aria-selected="false"
         aria-controls="tab-trends"
       >
-        <span class="ui-icon icon-trend" aria-hidden="true"></span> Trends
+        <span class="ui-icon" data-icon="trend" aria-hidden="true"></span> Trends
       </button>
     </nav>
 
@@ -303,7 +302,7 @@
           <span class="risk-badge default" id="risk-badge" aria-live="polite" aria-atomic="true">—</span>
         </div>
         <div class="gauge-track" role="meter" aria-label="Variance percentage" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-          <div class="gauge-fill" id="gauge-fill">0%</div>
+          <div class="gauge-fill" id="gauge-fill"></div>
         </div>
         <div class="gauge-scale" aria-hidden="true">
           <span>0%</span>
@@ -315,7 +314,7 @@
 
       <!-- Insight Card -->
       <div class="insight-card glass-card reveal-card" id="insight-card" aria-live="polite" aria-atomic="true">
-        <span class="insight-icon ui-icon icon-insight" id="insight-icon" aria-hidden="true"></span>
+        <span class="insight-icon" id="insight-icon" aria-hidden="true"></span>
         <p class="insight-text" id="insight-text">
           Select a city and zone, then adjust the sliders to generate a valuation. Results will appear here.
         </p>
@@ -370,9 +369,9 @@
         <div class="chart-header">
           <span class="chart-title">Rate Comparison — ₹/sqft</span>
           <div class="chart-legend" aria-hidden="true">
-            <span class="legend-dot" style="--dot-color: rgba(15,118,110,0.72)">Circle Rate</span>
-            <span class="legend-dot" style="--dot-color: rgba(3,105,161,0.72)">Market Rate</span>
-            <span class="legend-dot" style="--dot-color: rgba(183,121,31,0.56)">City Avg</span>
+            <span class="legend-dot" style="--dot-color: rgba(212,163,115,0.72)">Circle Rate</span>
+            <span class="legend-dot" style="--dot-color: rgba(10,132,255,0.72)">Market Rate</span>
+            <span class="legend-dot" style="--dot-color: rgba(128,128,128,0.5)">City Avg</span>
           </div>
         </div>
         <div class="chart-container">
@@ -384,11 +383,11 @@
       <div class="history-drawer" id="history-drawer">
         <button class="drawer-toggle" id="drawer-toggle" aria-expanded="false" aria-controls="drawer-body">
           <span class="drawer-toggle-left">
-            <span class="ui-icon icon-history" aria-hidden="true"></span>
+            <span class="ui-icon" data-icon="history" aria-hidden="true"></span>
             <span>Last Queries</span>
             <span class="drawer-count" id="drawer-count">0</span>
           </span>
-          <span class="drawer-chevron" aria-hidden="true">▾</span>
+          <span class="drawer-chevron" data-icon="chevron" aria-hidden="true"></span>
         </button>
         <div class="drawer-body" id="drawer-body" role="region" aria-label="Query history">
           <div class="history-list" id="history-list">
@@ -430,7 +429,7 @@
               <option value="">— Select Zone —</option>
             </select>
           </div>
-          <button class="btn btn-primary" id="btn-pin-zone" aria-label="Pin zone for comparison" disabled>
+          <button class="btn-primary" id="btn-pin-zone" aria-label="Pin zone for comparison" disabled>
             + Pin Zone
           </button>
         </div>
@@ -462,14 +461,14 @@
       </div>
       <div class="trends-main glass-card" id="trends-main">
         <div class="trends-empty" id="trends-empty">
-          <span class="empty-visual ui-icon icon-chart" aria-hidden="true"></span>
+          <span class="empty-visual ui-icon" data-icon="chart" aria-hidden="true"></span>
           Run a valuation first to unlock projected trend analysis for a zone.
         </div>
         <div class="trends-chart-wrap" id="trends-chart-wrap" hidden>
           <div class="trends-chart-header">
             <div class="trends-legend" aria-hidden="true">
-              <span class="legend-dot" style="--dot-color: rgba(15,118,110,0.82)">Market Rate</span>
-              <span class="legend-dot" style="--dot-color: rgba(100,116,139,0.8)">Circle Rate</span>
+              <span class="legend-dot" style="--dot-color: rgba(212,163,115,0.82)">Market Rate</span>
+              <span class="legend-dot" style="--dot-color: rgba(128,128,128,0.7)">Circle Rate</span>
             </div>
           </div>
           <canvas id="trends-chart" aria-label="Line chart showing 12-month market and circle rate trend"></canvas>
