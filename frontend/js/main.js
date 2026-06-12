@@ -8,7 +8,7 @@ import {
   toggleTheme, openSidebar, closeSidebar, filterZonesByCity,
   updateResults, resetResultCards, renderHistory, renderHeatmap,
   computeEMI, renderPinnedChips, renderCompareTable, renderTrendStats,
-  exportCSV, showToast,
+  showToast,
   initCursorTracker, initTicker, initScrollIndicator
 } from './ui.js';
 
@@ -330,7 +330,6 @@ function initEventListeners() {
     dom.drawerToggle.setAttribute('aria-expanded', String(isOpen));
   });
 
-  dom.btnExportCSV.addEventListener('click', exportCSV);
   dom.btnCopyURL.addEventListener('click', copyShareURL);
   dom.btnPrint.addEventListener('click', () => {
     dom.printTimestamp.textContent = `Generated: ${new Date().toLocaleString('en-IN')}`;

@@ -532,37 +532,3 @@ export function renderTrendStats(data, zoneName) {
   dom.trendAvgCircle.textContent    = formatINR(avgCircle) + '/sqft';
 }
 
-export function exportCSV() {
-  if (!state.lastResult) {
-    showError('No valuation result to export. Run a valuation first.');
-    return;
-  }
-
-  const d = state.lastResult;
-  const headers = [
-    'Zone', 'City', 'Circle Rate (₹/sqft)', 'Market Rate (₹/sqft)',
-    'Variance %', 'Risk Level', 'Base Value', 'Metro Premium',
-    'Age Depreciation', 'Speculative Uplift', 'Property Age', 'Metro Distance', 'Speculation Level', 'Timestamp',
-  ];
-  const row = [
-    d.zone_name, d.city, d.circle_rate, d.market_value,
-    d.variance_pct, d.risk_level, d.breakdown.base,
-    d.breakdown.metro_premium, d.breakdown.age_depreciation,
-    d.breakdown.speculative_uplift, dom.sliderAge.value, dom.sliderMetro.value, dom.sliderSpeculation.value, d.timestamp,
-  ];
-
-  const csvContent = [headers, row]
-    .map((r) => r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-    .join('\n');
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url  = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href     = url;
-  link.download = `valueguard-${d.zone_name.replace(/\s+/g, '-').toLowerCase()}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-  showToast('CSV exported successfully');
-}

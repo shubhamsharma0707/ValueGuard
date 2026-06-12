@@ -47,7 +47,6 @@ export const dom = {
   // Error banner & export
   errorBanner:       document.getElementById('error-banner'),
   errorMessage:      document.getElementById('error-message'),
-  btnExportCSV:      document.getElementById('btn-export-csv'),
   btnCopyURL:        document.getElementById('btn-copy-url'),
   btnPrint:          document.getElementById('btn-print'),
   printTimestamp:    document.getElementById('print-timestamp'),
