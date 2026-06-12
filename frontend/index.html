@@ -27,6 +27,11 @@
   <p id="print-timestamp"></p>
 </div>
 
+<!-- ══════════════════════ DATA TICKER — Live market feed ══════════════════════ -->
+<div class="ticker-bar" id="ticker-bar" aria-hidden="true">
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
 <div class="app-shell">
 
   <!-- ══════════════════════ TOP BAR ══════════════════════ -->
@@ -218,6 +223,14 @@
         <p class="brief-kicker">Real estate valuation intelligence</p>
         <h1 id="dashboard-title">Detect overpriced zones before the deal gets expensive.</h1>
         <p class="brief-copy">Compare circle rates, estimated market value, infrastructure premiums, and speculation risk across Indian tech corridors.</p>
+      </div>
+      <div class="scroll-indicator-outer" aria-hidden="true">
+        <div class="scroll-indicator" id="scroll-indicator" aria-hidden="true">
+          <span class="scroll-indicator-text">Scroll down</span>
+          <span class="scroll-indicator-arrow">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5l4 4 4-4"/></svg>
+          </span>
+        </div>
       </div>
       <div class="brief-metrics" aria-label="Product coverage">
         <div class="brief-metric">
@@ -498,6 +511,18 @@
 
   </main>
 </div>
+
+<!-- Cursor Tracker — inspired by matveyan.com's data-driven aesthetic -->
+<div class="cursor-tracker" id="cursor-tracker" aria-hidden="true">
+  <span class="cursor-tracker-label">Cursor</span>
+  <span class="cursor-tracker-data" id="cursor-pos">X: 0 · Y: 0</span>
+  <span class="cursor-tracker-data" id="scroll-pos">Scroll: 0</span>
+  <span class="cursor-tracker-data" id="time-elapsed">Time: 0.0s</span>
+</div>
+
+<!-- Custom cursor dot (desktop only) -->
+<div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
 
 <!-- Toast notification -->
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>

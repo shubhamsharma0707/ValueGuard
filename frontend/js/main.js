@@ -8,7 +8,8 @@ import {
   toggleTheme, openSidebar, closeSidebar, filterZonesByCity,
   updateResults, resetResultCards, renderHistory, renderHeatmap,
   computeEMI, renderPinnedChips, renderCompareTable, renderTrendStats,
-  exportCSV, showToast
+  exportCSV, showToast,
+  initCursorTracker, initTicker, initScrollIndicator
 } from './ui.js';
 
 async function fetchLocations() {
@@ -365,7 +366,10 @@ async function init() {
   initTabs();
   initSliderReadouts();
   initEventListeners();
+  initCursorTracker();
+  initScrollIndicator();
   await fetchLocations();
+  initTicker();
 }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -4,6 +4,141 @@ import { formatINR, riskClass, escapeHTML, speculationLabel, iconSVG, riskIconSV
 import { updateChart, updateEMIChart, renderRadarChart } from './charts.js';
 
 let toastTimer;
+let trackerStartTime;
+let trackerAnimFrame;
+
+/* ─── Cursor Tracker (inspired by matveyan.com) ───────── */
+
+export function initCursorTracker() {
+  if (!dom.cursorTracker) return;
+
+  trackerStartTime = performance.now();
+
+  document.addEventListener('mousemove', (e) => {
+    dom.cursorPos.textContent = `X: ${e.clientX} · Y: ${e.clientY}`;
+
+    // Custom cursor dot & ring
+    if (dom.cursorDot && dom.cursorRing && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      dom.cursorDot.style.left = `${e.clientX}px`;
+      dom.cursorDot.style.top = `${e.clientY}px`;
+      dom.cursorRing.style.left = `${e.clientX}px`;
+      dom.cursorRing.style.top = `${e.clientY}px`;
+    }
+  });
+
+  // Custom cursor ring hover effect — use JS classList instead of CSS sibling selector
+  const interactiveEls = document.querySelectorAll('a, button, .rate-card, .tab-btn');
+  const onHoverIn = () => { if (dom.cursorRing) dom.cursorRing.classList.add('enlarged'); };
+  const onHoverOut = () => { if (dom.cursorRing) dom.cursorRing.classList.remove('enlarged'); };
+  interactiveEls.forEach((el) => {
+    el.addEventListener('mouseenter', onHoverIn);
+    el.addEventListener('mouseleave', onHoverOut);
+  });
+
+  // Show custom cursor, hide default only on main content area (not inputs/selects)
+  if (dom.cursorDot && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    dom.mainPanel.style.cursor = 'none';
+  }
+
+  function updateTime() {
+    const elapsed = (performance.now() - trackerStartTime) / 1000;
+    dom.timeElapsed.textContent = `Time: ${elapsed.toFixed(1)}s`;
+    trackerAnimFrame = requestAnimationFrame(updateTime);
+  }
+  trackerAnimFrame = requestAnimationFrame(updateTime);
+
+  updateScrollPos();
+  window.addEventListener('scroll', updateScrollPos, { passive: true });
+}
+
+function updateScrollPos() {
+  const scrollY = window.scrollY || window.pageYOffset;
+  dom.scrollPos.textContent = `Scroll: ${Math.round(scrollY)}`;
+}
+
+export function destroyCursorTracker() {
+  if (trackerAnimFrame) cancelAnimationFrame(trackerAnimFrame);
+  document.body.style.cursor = '';
+}
+
+/* ─── Data Ticker ─────────────────────────────────────── */
+
+export function initTicker() {
+  if (!dom.tickerTrack || !state.locations.length) return;
+
+  const items = buildTickerItems();
+  renderTicker(items);
+}
+
+function buildTickerItems() {
+  if (!state.locations.length) return [];
+
+  const items = [];
+
+  // Get unique cities with their avg metrics
+  const cities = [...new Set(state.locations.map((l) => l.city))];
+  cities.forEach((city) => {
+    const zones = state.locations.filter((l) => l.city === city);
+    const avgCircle = Math.round(zones.reduce((s, z) => s + z.circle_rate_per_sqft, 0) / zones.length);
+    const avgMarket = Math.round(zones.reduce((s, z) => s + z.avg_market_rate_per_sqft, 0) / zones.length);
+    const variance = parseFloat((((avgMarket - avgCircle) / avgCircle) * 100).toFixed(1));
+    const changeCls = variance >= 0 ? 'positive' : 'negative';
+    items.push({
+      label: city,
+      value: `₹${avgMarket.toLocaleString('en-IN')}`,
+      change: `${variance > 0 ? '+' : ''}${variance}%`,
+      changeCls,
+    });
+  });
+
+  // Add a "Highest" and "Lowest" item
+  const sorted = [...state.locations].sort((a, b) => b.avg_market_rate_per_sqft - a.avg_market_rate_per_sqft);
+  if (sorted.length) {
+    const highest = sorted[0];
+    const lowest = sorted[sorted.length - 1];
+    items.push({ label: 'HIGH', value: `${highest.zone_name.split(' ')[0]} ₹${highest.avg_market_rate_per_sqft.toLocaleString('en-IN')}`, change: '', changeCls: 'positive' });
+    items.push({ label: 'LOW', value: `${lowest.zone_name.split(' ')[0]} ₹${lowest.avg_market_rate_per_sqft.toLocaleString('en-IN')}`, change: '', changeCls: '' });
+  }
+
+  return items;
+}
+
+function renderTicker(items) {
+  // Double the items for seamless loop
+  const renderSet = [...items, ...items];
+  dom.tickerTrack.innerHTML = renderSet.map((item) => `
+    <span class="ticker-item">
+      <span class="ticker-dot ${item.changeCls}"></span>
+      <span class="ticker-label">${escapeHTML(item.label)}</span>
+      <span class="ticker-value">${item.value}</span>
+      ${item.change ? `<span class="ticker-change ${item.changeCls}">${item.change}</span>` : ''}
+    </span>
+  `).join('');
+}
+
+export function refreshTicker() {
+  if (!dom.tickerTrack) return;
+  const items = buildTickerItems();
+  renderTicker(items);
+}
+
+/* ─── Scroll Indicator (inspired by matveyan.com) ──────── */
+
+export function initScrollIndicator() {
+  if (!dom.scrollIndicator) return;
+
+  const onScroll = () => {
+    if (window.scrollY > 60) {
+      dom.scrollIndicator.classList.add('hidden');
+    } else {
+      dom.scrollIndicator.classList.remove('hidden');
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+/* ─── Icons ───────────────────────────────────────────── */
 
 export function initIcons() {
   document.querySelectorAll('[data-icon]').forEach((el) => {
