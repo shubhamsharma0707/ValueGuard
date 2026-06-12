@@ -4,63 +4,6 @@ import { formatINR, riskClass, escapeHTML, speculationLabel, iconSVG, riskIconSV
 import { updateChart, updateEMIChart, renderRadarChart } from './charts.js';
 
 let toastTimer;
-let trackerStartTime;
-let trackerAnimFrame;
-
-/* ─── Cursor Tracker (inspired by matveyan.com) ───────── */
-
-export function initCursorTracker() {
-  if (!dom.cursorTracker) return;
-
-  trackerStartTime = performance.now();
-
-  document.addEventListener('mousemove', (e) => {
-    dom.cursorPos.textContent = `X: ${e.clientX} · Y: ${e.clientY}`;
-
-    // Custom cursor dot & ring
-    if (dom.cursorDot && dom.cursorRing && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      dom.cursorDot.style.left = `${e.clientX}px`;
-      dom.cursorDot.style.top = `${e.clientY}px`;
-      dom.cursorRing.style.left = `${e.clientX}px`;
-      dom.cursorRing.style.top = `${e.clientY}px`;
-    }
-  });
-
-  // Custom cursor ring hover effect — use JS classList instead of CSS sibling selector
-  const interactiveEls = document.querySelectorAll('a, button, .rate-card, .tab-btn');
-  const onHoverIn = () => { if (dom.cursorRing) dom.cursorRing.classList.add('enlarged'); };
-  const onHoverOut = () => { if (dom.cursorRing) dom.cursorRing.classList.remove('enlarged'); };
-  interactiveEls.forEach((el) => {
-    el.addEventListener('mouseenter', onHoverIn);
-    el.addEventListener('mouseleave', onHoverOut);
-  });
-
-  // Show custom cursor, hide default only on main content area (not inputs/selects)
-  if (dom.cursorDot && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    dom.mainPanel.style.cursor = 'none';
-  }
-
-  function updateTime() {
-    const elapsed = (performance.now() - trackerStartTime) / 1000;
-    dom.timeElapsed.textContent = `Time: ${elapsed.toFixed(1)}s`;
-    trackerAnimFrame = requestAnimationFrame(updateTime);
-  }
-  trackerAnimFrame = requestAnimationFrame(updateTime);
-
-  updateScrollPos();
-  window.addEventListener('scroll', updateScrollPos, { passive: true });
-}
-
-function updateScrollPos() {
-  const scrollY = window.scrollY || window.pageYOffset;
-  dom.scrollPos.textContent = `Scroll: ${Math.round(scrollY)}`;
-}
-
-export function destroyCursorTracker() {
-  if (trackerAnimFrame) cancelAnimationFrame(trackerAnimFrame);
-  document.body.style.cursor = '';
-}
-
 /* ─── Data Ticker ─────────────────────────────────────── */
 
 export function initTicker() {

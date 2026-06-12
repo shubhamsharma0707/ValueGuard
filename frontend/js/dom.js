@@ -97,13 +97,7 @@ export const dom = {
   // Toast
   toast:             document.getElementById('toast'),
 
-  // Cursor tracker
-  cursorTracker:     document.getElementById('cursor-tracker'),
-  cursorPos:         document.getElementById('cursor-pos'),
-  scrollPos:         document.getElementById('scroll-pos'),
-  timeElapsed:       document.getElementById('time-elapsed'),
-  cursorDot:         document.getElementById('cursor-dot'),
-  cursorRing:        document.getElementById('cursor-ring'),
+
 
   // Ticker
   tickerTrack:       document.getElementById('ticker-track'),

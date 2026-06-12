@@ -9,7 +9,7 @@ import {
   updateResults, resetResultCards, renderHistory, renderHeatmap,
   computeEMI, renderPinnedChips, renderCompareTable, renderTrendStats,
   showToast,
-  initCursorTracker, initTicker, initScrollIndicator
+  initTicker, initScrollIndicator
 } from './ui.js';
 
 async function fetchLocations() {
@@ -365,7 +365,6 @@ async function init() {
   initTabs();
   initSliderReadouts();
   initEventListeners();
-  initCursorTracker();
   initScrollIndicator();
   await fetchLocations();
   initTicker();
