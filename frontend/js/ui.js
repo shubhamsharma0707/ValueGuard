@@ -51,10 +51,10 @@ function renderTicker(items) {
   const renderSet = [...items, ...items];
   dom.tickerTrack.innerHTML = renderSet.map((item) => `
     <span class="ticker-item">
-      <span class="ticker-dot ${item.changeCls}"></span>
+      <span class="ticker-dot ${escapeHTML(item.changeCls)}"></span>
       <span class="ticker-label">${escapeHTML(item.label)}</span>
-      <span class="ticker-value">${item.value}</span>
-      ${item.change ? `<span class="ticker-change ${item.changeCls}">${item.change}</span>` : ''}
+      <span class="ticker-value">${escapeHTML(item.value)}</span>
+      ${item.change ? `<span class="ticker-change ${escapeHTML(item.changeCls)}">${escapeHTML(item.change)}</span>` : ''}
     </span>
   `).join('');
 }
@@ -253,7 +253,9 @@ export function renderHistory(history) {
   }
   dom.historyList.innerHTML = '';
   history.forEach((item) => {
-    const cls = riskClass(item.risk_level);
+    const cls         = riskClass(item.risk_level);
+    const marketValue = Number(item.market_value);
+    const variance    = parseFloat(item.variance_pct);
     const div = document.createElement('div');
     div.className = 'history-item';
     div.innerHTML = `
@@ -261,11 +263,11 @@ export function renderHistory(history) {
         <div class="history-zone">${escapeHTML(item.zone_name)}</div>
         <div class="history-city text-muted">${escapeHTML(item.city)}</div>
       </div>
-      <div class="history-rate">₹${Number(item.market_value).toLocaleString('en-IN')}/sqft</div>
-      <div class="history-variance ${cls}" style="font-family:var(--font-mono);font-size:0.72rem">
-        ${item.variance_pct > 0 ? '+' : ''}${item.variance_pct}%
+      <div class="history-rate">₹${isFinite(marketValue) ? marketValue.toLocaleString('en-IN') : '—'}/sqft</div>
+      <div class="history-variance ${escapeHTML(cls)}" style="font-family:var(--font-mono);font-size:0.72rem">
+        ${isFinite(variance) ? (variance > 0 ? '+' : '') + variance + '%' : '—'}
       </div>
-      <span class="history-badge hm-badge ${cls}">${escapeHTML(item.risk_level)}</span>
+      <span class="history-badge hm-badge ${escapeHTML(cls)}">${escapeHTML(item.risk_level)}</span>
     `;
     dom.historyList.appendChild(div);
   });

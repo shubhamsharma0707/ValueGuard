@@ -26,7 +26,8 @@ export async function fetchHistoryAPI() {
 }
 
 export async function fetchTrendsAPI(locationId, specLevel) {
-  const res = await fetch(`${API_BASE}/trends/${locationId}?speculation=${specLevel}`);
+  const safeId = encodeURIComponent(locationId);
+  const res = await fetch(`${API_BASE}/trends/${safeId}?speculation=${encodeURIComponent(specLevel)}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.json();
 }

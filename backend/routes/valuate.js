@@ -19,11 +19,36 @@ const {
 
 /**
  * In-memory session store for the last 5 valuations.
- * Managed as a shared array passed from server.js context
- * and referenced via closure over `valuationHistory`.
  * @type {Array<Object>}
  */
 const valuationHistory = [];
+
+/**
+ * Validates and sanitises a location_id string.
+ * Only alphanumeric characters, hyphens, and underscores are allowed.
+ * Max length: 64 characters.
+ * @param {string} id
+ * @returns {boolean}
+ */
+function isValidLocationId(id) {
+  if (typeof id !== 'string') return false;
+  if (id.length === 0 || id.length > 64) return false;
+  return /^[a-zA-Z0-9_-]+$/.test(id);
+}
+
+/**
+ * Clamps a number to [min, max]. Returns fallback if value is NaN or Infinity.
+ * @param {*} raw - Raw input value.
+ * @param {number} min
+ * @param {number} max
+ * @param {number} fallback - Value to use if coercion fails.
+ * @returns {number}
+ */
+function clampNumber(raw, min, max, fallback) {
+  const n = Number(raw);
+  if (!isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+}
 
 /**
  * GET /api/locations
@@ -44,23 +69,28 @@ router.get('/locations', (req, res) => {
 router.post('/valuate', (req, res) => {
   const { location_id, property_age, metro_distance_km, speculation_level } = req.body;
 
-  // --- Input validation ---
+  // ─── Input validation ────────────────────────────────────────────────────
+
   if (!location_id) {
     return res.status(400).json({ error: 'location_id is required.' });
+  }
+  if (!isValidLocationId(location_id)) {
+    return res.status(400).json({ error: 'location_id contains invalid characters or exceeds maximum length.' });
   }
 
   const location = locations.find((loc) => loc.id === location_id);
   if (!location) {
-    return res.status(404).json({ error: `Location "${location_id}" not found.` });
+    // Do NOT reflect the raw user input back in the error message.
+    return res.status(404).json({ error: 'Location not found.' });
   }
 
-  const age = Number(property_age) || 0;
-  const distanceKm = Number(metro_distance_km) ?? 5;
-  const specLevel = Number(speculation_level) || 1;
+  // Clamp all numeric inputs to their valid ranges.
+  const age       = clampNumber(property_age,      0,  40, 0);
+  const distanceKm = clampNumber(metro_distance_km, 0,  10, 5);
+  const specLevel  = clampNumber(speculation_level, 1,   5, 1);
 
-  // --- Formula components ---
-  // Use real zone_multiplier directly from curated data
-  const metroPremium = computeMetroPremium(location.metro_nearby, distanceKm);
+  // ─── Formula components ──────────────────────────────────────────────────
+  const metroPremium    = computeMetroPremium(location.metro_nearby, distanceKm);
   const ageDepreciation = computeAgeDepreciation(age);
   const speculativeUplift = computeSpeculativeUplift(specLevel);
 
@@ -75,35 +105,35 @@ router.post('/valuate', (req, res) => {
     (((marketValue - location.circle_rate_per_sqft) / location.circle_rate_per_sqft) * 100).toFixed(2)
   );
 
-  const riskLevel = getRiskLevel(variancePct);
+  const riskLevel  = getRiskLevel(variancePct);
   const reasonText = buildReasonText({
     speculationLevel: specLevel,
-    metroDistanceKm: distanceKm,
-    propertyAge: age,
+    metroDistanceKm:  distanceKm,
+    propertyAge:      age,
     variancePct,
-    metroNearby: location.metro_nearby,
+    metroNearby:      location.metro_nearby,
   });
 
   const result = {
-    zone_name: location.zone_name,
-    city: location.city,
-    circle_rate: location.circle_rate_per_sqft,
+    zone_name:    location.zone_name,
+    city:         location.city,
+    circle_rate:  location.circle_rate_per_sqft,
     market_value: marketValue,
     variance_pct: variancePct,
-    risk_level: riskLevel,
-    reason_text: reasonText,
+    risk_level:   riskLevel,
+    reason_text:  reasonText,
     breakdown: {
-      base: Math.round(location.circle_rate_per_sqft * location.zone_multiplier),
-      metro_premium: metroPremium,
-      age_depreciation: ageDepreciation,
+      base:              Math.round(location.circle_rate_per_sqft * location.zone_multiplier),
+      metro_premium:     metroPremium,
+      age_depreciation:  ageDepreciation,
       speculative_uplift: speculativeUplift,
     },
-    data_source: location.data_source,
+    data_source:  location.data_source,
     last_updated: location.last_updated,
-    timestamp: new Date().toISOString(),
+    timestamp:    new Date().toISOString(),
   };
 
-  // --- Store in session history (last 5) ---
+  // ─── Store in session history (last 5) ───────────────────────────────────
   valuationHistory.unshift({ ...result, location_id });
   if (valuationHistory.length > 5) valuationHistory.pop();
 
@@ -119,3 +149,4 @@ router.get('/history', (req, res) => {
 });
 
 module.exports = router;
+

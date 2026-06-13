@@ -13,6 +13,19 @@ const locations = require('../data.json');
 const { generateTrend } = require('../services/trendService');
 
 /**
+ * Validates a location_id path parameter.
+ * Only alphanumeric characters, hyphens, and underscores are allowed.
+ * Max length: 64 characters.
+ * @param {string} id
+ * @returns {boolean}
+ */
+function isValidLocationId(id) {
+  if (typeof id !== 'string') return false;
+  if (id.length === 0 || id.length > 64) return false;
+  return /^[a-zA-Z0-9_-]+$/.test(id);
+}
+
+/**
  * GET /api/trends/:location_id
  * Returns 12 monthly data points for the selected zone.
  *
@@ -20,11 +33,18 @@ const { generateTrend } = require('../services/trendService');
  */
 router.get('/:location_id', (req, res) => {
   const { location_id }   = req.params;
+
+  // ─── Input validation ────────────────────────────────────────────────────
+  if (!isValidLocationId(location_id)) {
+    return res.status(400).json({ error: 'location_id contains invalid characters or exceeds maximum length.' });
+  }
+
   const speculationLvl    = Math.min(5, Math.max(1, Number(req.query.speculation) || 3));
 
   const loc = locations.find((l) => l.id === location_id);
   if (!loc) {
-    return res.status(404).json({ error: `Location "${location_id}" not found.` });
+    // Do NOT reflect the raw user input back in the error message.
+    return res.status(404).json({ error: 'Location not found.' });
   }
 
   const trend = generateTrend(loc, speculationLvl);
@@ -38,3 +58,4 @@ router.get('/:location_id', (req, res) => {
 });
 
 module.exports = router;
+
