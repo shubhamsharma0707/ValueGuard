@@ -415,3 +415,43 @@ export function renderTrendsChart(data) {
     },
   });
 }
+
+export function refreshChartsTheme() {
+  const isDark = !document.documentElement.getAttribute('data-theme');
+  const gridClr = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const tickClr = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)';
+  const tipBg   = isDark ? '#1d1d29' : '#ffffff';
+  const tipBody = isDark ? '#e2e2e2' : '#1e293b';
+
+  Object.values(charts).forEach(chart => {
+    if (!chart) return;
+    
+    if (chart.options.plugins && chart.options.plugins.tooltip) {
+      chart.options.plugins.tooltip.backgroundColor = tipBg;
+      chart.options.plugins.tooltip.titleColor = tickClr;
+      chart.options.plugins.tooltip.bodyColor = tipBody;
+    }
+    
+    if (chart.options.scales) {
+      if (chart.options.scales.x) {
+        if (chart.options.scales.x.grid) chart.options.scales.x.grid.color = gridClr;
+        if (chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = tickClr;
+      }
+      if (chart.options.scales.y) {
+        if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = gridClr;
+        if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = tickClr;
+      }
+      if (chart.options.scales.r) {
+        if (chart.options.scales.r.grid) chart.options.scales.r.grid.color = gridClr;
+        if (chart.options.scales.r.angleLines) chart.options.scales.r.angleLines.color = gridClr;
+        if (chart.options.scales.r.pointLabels) chart.options.scales.r.pointLabels.color = tickClr;
+      }
+    }
+    
+    if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+       chart.options.plugins.legend.labels.color = tickClr;
+    }
+
+    chart.update('none');
+  });
+}

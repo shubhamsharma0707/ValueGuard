@@ -2,7 +2,7 @@ import { dom } from './dom.js';
 import { state } from './state.js';
 import { debounce, speculationLabel } from './utils.js';
 import { fetchLocationsAPI, submitValuationAPI, fetchHistoryAPI, fetchTrendsAPI } from './api.js';
-import { updateSensitivityChart, renderRadarChart, renderTrendsChart } from './charts.js';
+import { updateSensitivityChart, renderRadarChart, renderTrendsChart, refreshChartsTheme } from './charts.js';
 import {
   showError, hideError, showSkeleton, initTheme, initIcons,
   toggleTheme, openSidebar, closeSidebar, filterZonesByCity,
@@ -356,6 +356,8 @@ function initEventListeners() {
   });
 
   dom.sensitivityAxis.addEventListener('change', updateSensitivityChart);
+  
+  window.addEventListener('themeChanged', refreshChartsTheme);
 }
 
 async function init() {

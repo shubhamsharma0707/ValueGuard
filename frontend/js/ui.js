@@ -121,11 +121,11 @@ export function initTheme() {
 export function applyTheme(theme) {
   if (theme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
-    dom.themeIcon.innerHTML = iconSVG('sun');
+    dom.themeIcon.innerHTML = iconSVG('moon');
     dom.themeToggle.setAttribute('aria-label', 'Switch to dark mode');
   } else {
     document.documentElement.removeAttribute('data-theme');
-    dom.themeIcon.innerHTML = iconSVG('moon');
+    dom.themeIcon.innerHTML = iconSVG('sun');
     dom.themeToggle.setAttribute('aria-label', 'Switch to light mode');
   }
   localStorage.setItem('vg-theme', theme);
