@@ -1970,9 +1970,17 @@ body::before {
   margin-bottom: 10px;
 }
 
+.trends-chart-wrap {
+  height: 270px;
+  overflow: hidden;
+}
+
 .trends-chart-wrap canvas,
 #trends-chart {
-  height: 270px;
+  display: block;
+  width: 100% !important;
+  height: 270px !important;
+  max-height: 270px;
   will-change: contents;
   transform: translateZ(0);
 }

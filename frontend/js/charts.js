@@ -396,7 +396,7 @@ export function renderTrendsChart(data) {
     type: 'line',
     data: chartData,
     options: {
-      responsive: true,
+      responsive: false,
       maintainAspectRatio: false,
       animation: false,
       resizeDelay: 200,
