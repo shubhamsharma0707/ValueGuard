@@ -81,16 +81,6 @@ export const dom = {
   pinnedChips:       document.getElementById('pinned-chips'),
   compareTableWrap:  document.getElementById('compare-table-wrap'),
 
-  // Trends
-  trendsSubtitle:    document.getElementById('trends-subtitle'),
-  trendsEmpty:       document.getElementById('trends-empty'),
-  trendsChartWrap:   document.getElementById('trends-chart-wrap'),
-  trendStats:        document.getElementById('trend-stats'),
-  trendAppreciation: document.getElementById('trend-appreciation'),
-  trendPeak:         document.getElementById('trend-peak'),
-  trendTrough:       document.getElementById('trend-trough'),
-  trendAvgCircle:    document.getElementById('trend-avg-circle'),
-
   // Main content area
   mainPanel:         document.getElementById('main-panel'),
 

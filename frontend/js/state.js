@@ -17,5 +17,4 @@ export const charts = {
   emiChart:         null,
   sensitivityChart: null,
   radarChart:       null,
-  trendsChart:      null,
 };

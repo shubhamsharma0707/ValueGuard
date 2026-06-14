@@ -279,15 +279,6 @@
       >
         <span class="ui-icon" data-icon="compare" aria-hidden="true"></span> Compare
       </button>
-      <button
-        class="tab-btn"
-        id="tab-btn-trends"
-        role="tab"
-        aria-selected="false"
-        aria-controls="tab-trends"
-      >
-        <span class="ui-icon" data-icon="trend" aria-hidden="true"></span> Trends
-      </button>
     </nav>
 
     <!-- ─── Tab: Valuate ─── -->
@@ -464,49 +455,6 @@
         </div>
         <div class="radar-chart-wrap">
           <canvas id="radar-chart" aria-label="Radar chart comparing multiple factors across pinned zones"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- ─── Tab: Trends ─── -->
-    <section class="tab-panel" id="tab-trends" role="tabpanel" aria-labelledby="tab-btn-trends">
-      <div class="trends-header">
-        <div class="trends-title">Projected Price Trends</div>
-        <p class="trends-subtitle" id="trends-subtitle">Select a zone in the Valuate tab to load projected trend data.</p>
-      </div>
-      <div class="trends-main glass-card" id="trends-main">
-        <div class="trends-empty" id="trends-empty">
-          <span class="empty-visual ui-icon" data-icon="chart" aria-hidden="true"></span>
-          Run a valuation first to unlock projected trend analysis for a zone.
-        </div>
-        <div class="trends-chart-wrap" id="trends-chart-wrap" hidden>
-          <div class="trends-chart-header">
-            <div class="trends-legend" aria-hidden="true">
-              <span class="legend-dot" style="--dot-color: rgba(212,163,115,0.82)">Market Rate</span>
-              <span class="legend-dot" style="--dot-color: rgba(128,128,128,0.7)">Circle Rate</span>
-            </div>
-          </div>
-          <canvas id="trends-chart" aria-label="Line chart showing 12-month market and circle rate trend"></canvas>
-        </div>
-      </div>
-
-      <!-- Trend stats strip -->
-      <div class="trend-stats" id="trend-stats" hidden>
-        <div class="trend-stat glass-card">
-          <div class="trend-stat-label">12M Projected Appreciation</div>
-          <div class="trend-stat-value" id="trend-appreciation">—</div>
-        </div>
-        <div class="trend-stat glass-card">
-          <div class="trend-stat-label">Peak Market Rate</div>
-          <div class="trend-stat-value" id="trend-peak">—</div>
-        </div>
-        <div class="trend-stat glass-card">
-          <div class="trend-stat-label">Trough Market Rate</div>
-          <div class="trend-stat-value" id="trend-trough">—</div>
-        </div>
-        <div class="trend-stat glass-card">
-          <div class="trend-stat-label">Avg Circle Rate</div>
-          <div class="trend-stat-value" id="trend-avg-circle">—</div>
         </div>
       </div>
     </section>

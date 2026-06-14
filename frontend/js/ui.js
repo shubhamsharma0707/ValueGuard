@@ -459,21 +459,4 @@ export function renderCompareTable() {
   dom.compareTableWrap.appendChild(table);
 }
 
-export function renderTrendStats(data, zoneName) {
-  const mktVals = data.map((d) => d.market_rate);
-  const cirVals = data.map((d) => d.circle_rate);
-
-  const first       = mktVals[0];
-  const last        = mktVals[mktVals.length - 1];
-  const appreciation = parseFloat((((last - first) / first) * 100).toFixed(1));
-  const peak        = Math.max(...mktVals);
-  const trough      = Math.min(...mktVals);
-  const avgCircle   = Math.round(cirVals.reduce((a, b) => a + b, 0) / cirVals.length);
-
-  dom.trendAppreciation.textContent = `${appreciation > 0 ? '+' : ''}${appreciation}%`;
-  dom.trendAppreciation.style.color = appreciation >= 0 ? 'var(--clr-green)' : 'var(--clr-red)';
-  dom.trendPeak.textContent         = formatINR(peak) + '/sqft';
-  dom.trendTrough.textContent       = formatINR(trough) + '/sqft';
-  dom.trendAvgCircle.textContent    = formatINR(avgCircle) + '/sqft';
-}
 

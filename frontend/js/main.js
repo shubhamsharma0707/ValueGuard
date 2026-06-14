@@ -1,13 +1,13 @@
 import { dom } from './dom.js';
 import { state } from './state.js';
 import { debounce, speculationLabel } from './utils.js';
-import { fetchLocationsAPI, submitValuationAPI, fetchHistoryAPI, fetchTrendsAPI } from './api.js';
-import { updateSensitivityChart, renderRadarChart, renderTrendsChart, refreshChartsTheme } from './charts.js';
+import { fetchLocationsAPI, submitValuationAPI, fetchHistoryAPI } from './api.js';
+import { updateSensitivityChart, renderRadarChart, refreshChartsTheme } from './charts.js';
 import {
   showError, hideError, showSkeleton, initTheme, initIcons,
   toggleTheme, openSidebar, closeSidebar, filterZonesByCity,
   updateResults, resetResultCards, renderHistory, renderHeatmap,
-  computeEMI, renderPinnedChips, renderCompareTable, renderTrendStats,
+  computeEMI, renderPinnedChips, renderCompareTable,
   showToast,
   initTicker, initScrollIndicator
 } from './ui.js';
@@ -97,37 +97,6 @@ async function fetchHistory() {
   }
 }
 
-async function fetchTrends(locationId) {
-  if (!locationId) {
-    dom.trendsEmpty.hidden = false;
-    dom.trendsChartWrap.hidden = true;
-    dom.trendStats.hidden = true;
-    dom.trendsSubtitle.textContent = 'Select a zone in the Valuate tab to load projected trend data.';
-    return;
-  }
-
-  const specLevel = dom.sliderSpeculation.value;
-
-  try {
-    const { zone_name, city, data } = await fetchTrendsAPI(locationId, specLevel);
-
-    dom.trendsSubtitle.textContent = `${zone_name}, ${city} — 12-Month Projected Trend`;
-    dom.trendsEmpty.hidden     = true;
-    dom.trendsChartWrap.hidden = false;
-    dom.trendStats.hidden      = false;
-
-    renderTrendsChart(data);
-    renderTrendStats(data, zone_name);
-
-  } catch (err) {
-    console.error('[ValueGuard] Trends fetch failed:', err);
-    dom.trendsEmpty.hidden = false;
-    dom.trendsChartWrap.hidden = true;
-    dom.trendStats.hidden = true;
-    dom.trendsSubtitle.textContent = `Error loading trend data: ${err.message}`;
-  }
-}
-
 async function submitValuation() {
   const locationId = dom.zoneSelect.value;
   if (!locationId) return;
@@ -151,8 +120,8 @@ async function submitValuation() {
     updateSensitivityChart();
     encodeURLState();
 
-    if (document.getElementById('tab-trends').classList.contains('active')) {
-      fetchTrends(locationId);
+    if (document.getElementById('tab-trends') && document.getElementById('tab-trends').classList.contains('active')) {
+      // trends tab removed
     }
 
     if (dom.emiBody && !dom.emiBody.hidden) {
@@ -242,10 +211,7 @@ function initTabs() {
       document.getElementById(panelId).classList.add('active');
 
       if (panelId === 'tab-trends') {
-        const zoneId = dom.zoneSelect.value || (state.lastResult ? state.lastResult.location_id : null);
-        // Double rAF: first frame starts the CSS transition, second frame
-        // lets the browser complete layout so Chart.js gets real dimensions.
-        requestAnimationFrame(() => requestAnimationFrame(() => fetchTrends(zoneId)));
+        // Trends section removed
       }
     });
   });

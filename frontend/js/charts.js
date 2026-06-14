@@ -11,8 +11,6 @@ const BLUE_BORDER = 'rgba(128, 128, 128, 1)';
 const GRAY = 'rgba(128, 128, 128, 0.5)';
 const GRAY_STRONG = 'rgba(128, 128, 128, 0.7)';
 
-// Cached gradient for trends chart — created once, reused on every update
-let _trendsGrad = null;
 
 function computeCityAverages(city) {
   const zones = state.locations.filter((l) => l.city === city);
@@ -332,101 +330,6 @@ export function renderRadarChart() {
   });
 }
 
-export function renderTrendsChart(data) {
-  const labels  = data.map((d) => d.month);
-  const mktVals = data.map((d) => d.market_rate);
-  const cirVals = data.map((d) => d.circle_rate);
-
-  const canvas = document.getElementById('trends-chart');
-  const ctx    = canvas.getContext('2d');
-
-  // Reuse gradient — only create once to avoid re-triggering compositing
-  if (!_trendsGrad) {
-    _trendsGrad = ctx.createLinearGradient(0, 0, 0, 270);
-    _trendsGrad.addColorStop(0, ACCENT_GRADIENT);
-    _trendsGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-  }
-
-  const isDark  = !document.documentElement.getAttribute('data-theme');
-  const gridClr = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-  const tickClr = isDark ? 'rgba(255,255,255,0.4)'  : 'rgba(0,0,0,0.35)';
-
-  // Fast-path: just swap data arrays in-place, no full object replacement
-  if (charts.trendsChart) {
-    const ds = charts.trendsChart.data;
-    ds.labels          = labels;
-    ds.datasets[0].data = mktVals;
-    ds.datasets[1].data = cirVals;
-    charts.trendsChart.update('none');
-    return;
-  }
-
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        label: 'Market Rate',
-        data: mktVals,
-        borderColor: ACCENT_STRONG,
-        backgroundColor: _trendsGrad,
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
-        pointHoverRadius: 6,
-        pointBackgroundColor: ACCENT_BORDER,
-      },
-      {
-        label: 'Circle Rate',
-        data: cirVals,
-        borderColor: GRAY_STRONG,
-        backgroundColor: 'transparent',
-        borderWidth: 1.5,
-        borderDash: [4, 4],
-        fill: false,
-        tension: 0.4,
-        pointRadius: 2,
-        pointHoverRadius: 4,
-        pointBackgroundColor: GRAY_STRONG,
-      },
-    ],
-  };
-
-  charts.trendsChart = new Chart(ctx, {
-    type: 'line',
-    data: chartData,
-    options: {
-      responsive: false,
-      maintainAspectRatio: false,
-      animation: false,
-      resizeDelay: 200,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: isDark ? '#1d1d29' : '#fff',
-          borderColor: 'rgba(255,255,255,0.06)',
-          borderWidth: 1,
-          titleColor: tickClr,
-          bodyColor:  isDark ? '#e2e2e2' : '#1e293b',
-          callbacks: {
-            label: (ctx) => ` ${ctx.dataset.label}: ₹${Number(ctx.raw).toLocaleString('en-IN')}/sqft`,
-          },
-        },
-      },
-      scales: {
-        x: { grid: { color: gridClr }, ticks: { color: tickClr, font: { size: 10 } } },
-        y: {
-          grid: { color: gridClr },
-          ticks: {
-            color: tickClr, font: { size: 10 },
-            callback: (v) => `₹${Number(v).toLocaleString('en-IN')}`,
-          },
-        },
-      },
-    },
-  });
-}
 
 export function refreshChartsTheme() {
   const isDark = !document.documentElement.getAttribute('data-theme');
