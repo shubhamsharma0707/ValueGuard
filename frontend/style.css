@@ -784,9 +784,11 @@ body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4t5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c8TV1mAAAAG3RSTlNAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAvEOwtAAAFVklEQVR4XpWWB67c2BUFb3g557T/hRo9/WUMZHlgr4Bg8Z4qQgQJlHI4A8SzFVrapvmTF9O7dmYRFZ60YiBhJRCgh1FYhiLAmdvX0CzTOpNE77ME0Zty/nWWzchDtiqrmQDeuv3powQ5ta2eN0FY0InkqDD73lT9c9lEzwUNqgFHs9VQce3TVClFCQrSTfOiYkVJQBmpbq2L6iZavPnAPcoU0dSw0SUTqz/GtrGuXfbyyBniKykOWQWGqwwMA7QiYAxi+IlPdqo+hYHnUt5ZPfnsHJyNiDtnpJyayNBkF6cWoYGAMY92Zupon4Mvf/Sy5dIfFqYAJORLcd2XkSw1XXrCr+5+LXhR/jBFQqkZEkR8F+B8Ue2xG7sRjJDtGQe8I0hIAq2VY08MLQrQ6NDMU2TFq7Hh7jHFVjJ4EYfyuSmyFQS/blBhGPe25kAEKoJqLW7x7OgvuK8NKqCg0R7KkCQE9HbMbIhVzU8+8oD2pmNGQjP9PFEBvzF1PJw2hn2LOPJbEoP6c+M9m7/E9d4VFl7W8zP9cXFYWlRsA99m0aNALDlVMD0VXcUgF6NrAaEFGRtxIL9+rM8Lf7CqMJpjByVl15HsHVBEPPFoBTMNHHmYVp7ZR9bL2cXXPN8PfzW7Z4BNCKS1NNYoWiUWFsLJGCa9e9K2bpOuwvIWvSJFXXHrNRSa4OIGBJDkAgIixC+BNVMQJF0WFGQJ2CmYnuivBSYZBNFJVF3WJlaBXDUBcm2z/SdEQKJpHEBvzExEXmAcDQhiNBvXCIUjJ5AxjkQDEgG0hhSQdJ4QDXM8qSASH/2b+ioiN02AByS7O3LUbvh6JG3MtPiENfKkrLK0s0I9pVEhHOVTDDSQVlQJNiMATF5gKaGLFBOJ1KV9pFRN/v3ppwqZ6zq/l1L8ldTXDfGCON6FQBU7Lce0XcVGnhOHD2beCx3AQFi1wkmLpK5+SYeVkN4JFfqcK1bS6fK1fVTiR1FPc+r0KLSQ3K+VBWelSPuCsWijhGOVMERKNB6mJyGqTNMTBvPR8SvSb5K6b1XL7W48TM0l5M6j5nQF/Nwj/+bPDn8cE8Pee8E6sVfC1aSEYAGYBqv6BAgAA");
+  opacity: 0.025;
   pointer-events: none;
   z-index: 9999;
+  will-change: auto;
 }
 
 .btn-toolbar:hover {
@@ -929,6 +931,7 @@ body::before {
   animation: breathe-gradient 6s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: 0;
+  will-change: opacity, transform;
 }
 
 .dashboard-brief > * {
@@ -1937,6 +1940,8 @@ body::before {
   padding: 18px 20px;
   margin-bottom: 12px;
   transform: translateZ(0);
+  isolation: isolate;
+  contain: layout style;
 }
 
 .trends-empty {
