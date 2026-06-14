@@ -243,7 +243,9 @@ function initTabs() {
 
       if (panelId === 'tab-trends') {
         const zoneId = dom.zoneSelect.value || (state.lastResult ? state.lastResult.location_id : null);
-        fetchTrends(zoneId);
+        // Defer until after browser has painted the newly-visible tab panel,
+        // so Chart.js measures the correct canvas dimensions on first init.
+        requestAnimationFrame(() => fetchTrends(zoneId));
       }
     });
   });

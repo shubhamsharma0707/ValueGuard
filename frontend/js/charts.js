@@ -378,7 +378,7 @@ export function renderTrendsChart(data) {
 
   if (charts.trendsChart) {
     charts.trendsChart.data = chartData;
-    charts.trendsChart.update('active');
+    charts.trendsChart.update('none');
     return;
   }
 
@@ -388,6 +388,7 @@ export function renderTrendsChart(data) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },
