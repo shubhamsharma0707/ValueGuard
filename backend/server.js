@@ -104,12 +104,19 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error. Please try again.' });
 });
 
-// ─── Start Server ────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`ValueGuard running at http://localhost:${PORT}`);
-  console.log(`   Endpoints:`);
-  console.log(`   GET  http://localhost:${PORT}/api/locations`);
-  console.log(`   POST http://localhost:${PORT}/api/valuate`);
-  console.log(`   GET  http://localhost:${PORT}/api/history`);
-  console.log(`   GET  http://localhost:${PORT}/api/trends/:location_id`);
-});
+// ─── Start Server (local only) ───────────────────────────────────────────────
+// On Vercel the file is imported as a module; app.listen() must not be called.
+// require.main === module is true only when run directly via `node server.js`.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`ValueGuard running at http://localhost:${PORT}`);
+    console.log(`   Endpoints:`);
+    console.log(`   GET  http://localhost:${PORT}/api/locations`);
+    console.log(`   POST http://localhost:${PORT}/api/valuate`);
+    console.log(`   GET  http://localhost:${PORT}/api/history`);
+    console.log(`   GET  http://localhost:${PORT}/api/trends/:location_id`);
+  });
+}
+
+// ─── Export for Vercel serverless runtime ────────────────────────────────────
+module.exports = app;
