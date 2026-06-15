@@ -6,7 +6,8 @@
 
 'use strict';
 
-require('dotenv').config({ path: __dirname + '/.env' });
+// Load .env for local dev; in production (Railway) env vars are injected by the platform.
+require('dotenv').config();
 
 const express    = require('express');
 const cors       = require('cors');
@@ -17,6 +18,7 @@ const valuateRouter = require('./routes/valuate');
 const trendsRouter  = require('./routes/trends');
 
 const app  = express();
+// Railway injects PORT dynamically (usually 8080). Fall back to 3000 for local dev.
 const PORT = process.env.PORT || 3000;
 
 // ─── Security headers (Helmet) ─────────────────────────────────────────────
@@ -40,16 +42,21 @@ app.use(
   })
 );
 
-// ─── CORS — only same-origin / localhost ───────────────────────────────────
-const allowedOrigins = [
-  `http://localhost:${PORT}`,
-  `http://127.0.0.1:${PORT}`,
-];
+// ─── CORS ───────────────────────────────────────────────────────────────────
+// Allow: same-origin (no Origin header), localhost dev servers, and any
+// *.railway.app subdomain so Railway's own domain can call the API.
+const RAILWAY_ORIGIN_RE = /^https:\/\/[a-z0-9-]+\.railway\.app$/i;
+
 app.use(
   cors({
     origin: (origin, cb) => {
-      // Allow requests with no Origin header (same-origin, curl, Postman)
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      if (!origin) return cb(null, true); // same-origin / curl / Postman
+      if (
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
+        RAILWAY_ORIGIN_RE.test(origin)
+      ) {
+        return cb(null, true);
+      }
       cb(new Error('CORS: origin not allowed'));
     },
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -108,7 +115,8 @@ app.use((err, req, res, next) => {
 // On Vercel the file is imported as a module; app.listen() must not be called.
 // require.main === module is true only when run directly via `node server.js`.
 if (require.main === module) {
-  app.listen(PORT, () => {
+  // Bind to 0.0.0.0 so Railway's internal proxy can reach the server.
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`ValueGuard running at http://localhost:${PORT}`);
     console.log(`   Endpoints:`);
     console.log(`   GET  http://localhost:${PORT}/api/locations`);
