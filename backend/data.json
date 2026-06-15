@@ -490,5 +490,266 @@
     "it_corridor": false,
     "data_source": "Karnataka Kaveri Portal / Guidance Value 2024-25",
     "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "roh_model_town",
+    "zone_name": "Model Town Rohtak",
+    "city": "Rohtak",
+    "circle_rate_per_sqft": 3200,
+    "avg_market_rate_per_sqft": 5100,
+    "zone_multiplier": 1.59,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "roh_delhi_road",
+    "zone_name": "Delhi Road Rohtak",
+    "city": "Rohtak",
+    "circle_rate_per_sqft": 3600,
+    "avg_market_rate_per_sqft": 5800,
+    "zone_multiplier": 1.61,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "roh_asthal_bohar",
+    "zone_name": "Asthal Bohar Rohtak",
+    "city": "Rohtak",
+    "circle_rate_per_sqft": 2700,
+    "avg_market_rate_per_sqft": 4000,
+    "zone_multiplier": 1.48,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "his_urban_estate",
+    "zone_name": "Urban Estate Hisar",
+    "city": "Hisar",
+    "circle_rate_per_sqft": 2800,
+    "avg_market_rate_per_sqft": 4300,
+    "zone_multiplier": 1.54,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "his_sector13",
+    "zone_name": "Sector 13 Hisar",
+    "city": "Hisar",
+    "circle_rate_per_sqft": 3100,
+    "avg_market_rate_per_sqft": 4900,
+    "zone_multiplier": 1.58,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "his_agro_food_park",
+    "zone_name": "Agro Food Park Hisar",
+    "city": "Hisar",
+    "circle_rate_per_sqft": 2300,
+    "avg_market_rate_per_sqft": 3500,
+    "zone_multiplier": 1.52,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "kar_sector7",
+    "zone_name": "Sector 7 Karnal",
+    "city": "Karnal",
+    "circle_rate_per_sqft": 3400,
+    "avg_market_rate_per_sqft": 5300,
+    "zone_multiplier": 1.56,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "kar_kunjpura",
+    "zone_name": "Kunjpura Road Karnal",
+    "city": "Karnal",
+    "circle_rate_per_sqft": 3800,
+    "avg_market_rate_per_sqft": 6100,
+    "zone_multiplier": 1.61,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "kar_gtkarnal_road",
+    "zone_name": "GT Karnal Road",
+    "city": "Karnal",
+    "circle_rate_per_sqft": 2900,
+    "avg_market_rate_per_sqft": 4600,
+    "zone_multiplier": 1.59,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "pan_sector13",
+    "zone_name": "Sector 13 Panipat",
+    "city": "Panipat",
+    "circle_rate_per_sqft": 2600,
+    "avg_market_rate_per_sqft": 4000,
+    "zone_multiplier": 1.54,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "pan_model_town",
+    "zone_name": "Model Town Panipat",
+    "city": "Panipat",
+    "circle_rate_per_sqft": 2900,
+    "avg_market_rate_per_sqft": 4500,
+    "zone_multiplier": 1.55,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "yam_jagadhri_road",
+    "zone_name": "Jagadhri Road Yamunanagar",
+    "city": "Yamunanagar",
+    "circle_rate_per_sqft": 2400,
+    "avg_market_rate_per_sqft": 3700,
+    "zone_multiplier": 1.54,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "yam_sector17",
+    "zone_name": "Sector 17 Yamunanagar",
+    "city": "Yamunanagar",
+    "circle_rate_per_sqft": 2700,
+    "avg_market_rate_per_sqft": 4200,
+    "zone_multiplier": 1.56,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "rew_sector3",
+    "zone_name": "Sector 3 Rewari",
+    "city": "Rewari",
+    "circle_rate_per_sqft": 2200,
+    "avg_market_rate_per_sqft": 3400,
+    "zone_multiplier": 1.55,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "rew_dharuhera",
+    "zone_name": "Dharuhera Rewari",
+    "city": "Rewari",
+    "circle_rate_per_sqft": 3000,
+    "avg_market_rate_per_sqft": 5100,
+    "zone_multiplier": 1.70,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "bhw_city_centre",
+    "zone_name": "City Centre Bhiwani",
+    "city": "Bhiwani",
+    "circle_rate_per_sqft": 1900,
+    "avg_market_rate_per_sqft": 2900,
+    "zone_multiplier": 1.53,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "bhw_hansi_road",
+    "zone_name": "Hansi Road Bhiwani",
+    "city": "Bhiwani",
+    "circle_rate_per_sqft": 1700,
+    "avg_market_rate_per_sqft": 2600,
+    "zone_multiplier": 1.53,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "kuk_sector2",
+    "zone_name": "Sector 2 Kurukshetra",
+    "city": "Kurukshetra",
+    "circle_rate_per_sqft": 2500,
+    "avg_market_rate_per_sqft": 3900,
+    "zone_multiplier": 1.56,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "kuk_pipli",
+    "zone_name": "Pipli Kurukshetra",
+    "city": "Kurukshetra",
+    "circle_rate_per_sqft": 2100,
+    "avg_market_rate_per_sqft": 3200,
+    "zone_multiplier": 1.52,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+
+  {
+    "id": "jha_sector1",
+    "zone_name": "Sector 1 Jhajjar",
+    "city": "Jhajjar",
+    "circle_rate_per_sqft": 1800,
+    "avg_market_rate_per_sqft": 2800,
+    "zone_multiplier": 1.56,
+    "metro_nearby": false,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
+  },
+  {
+    "id": "jha_bahadurgarh",
+    "zone_name": "Bahadurgarh Jhajjar",
+    "city": "Jhajjar",
+    "circle_rate_per_sqft": 3500,
+    "avg_market_rate_per_sqft": 5800,
+    "zone_multiplier": 1.66,
+    "metro_nearby": true,
+    "it_corridor": false,
+    "data_source": "Haryana HRERA / Collector Rate 2024-25",
+    "last_updated": "2025-04-01"
   }
 ]
