@@ -39,16 +39,23 @@ async function fetchLocations() {
     const data = await fetchLocationsAPI();
     state.locations = data;
     hideError();
-
     populateStateDropdowns();
     applyURLParams();
-
   } catch (err) {
     console.error('[ValueGuard] Failed to load locations:', err);
-    dom.stateSelect.innerHTML = '<option value="">Server unavailable</option>';
-    showError('Cannot reach the server at localhost:3000. Run: npm run dev');
+    if (dom.stateSelect) {
+      dom.stateSelect.innerHTML = '<option value="">⚠ Failed to load — reload page</option>';
+      dom.stateSelect.disabled = false;
+    }
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    showError(
+      isLocal
+        ? 'Cannot reach the server. Run: npm run dev'
+        : `Failed to load zone data: ${err.message}. Please refresh.`
+    );
   }
 }
+
 
 /* ─── URL State Encoding ───────────────────────────────────────────── */
 
