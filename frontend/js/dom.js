@@ -1,5 +1,6 @@
 export const dom = {
   // Controls
+  stateSelect:       document.getElementById('state-select'),
   citySelect:        document.getElementById('city-select'),
   zoneSelect:        document.getElementById('zone-select'),
   sliderAge:         document.getElementById('slider-age'),
@@ -75,6 +76,7 @@ export const dom = {
   sensitivityHint:   document.getElementById('sensitivity-hint'),
 
   // Compare
+  compareStateSelect: document.getElementById('compare-state-select'),
   compareCitySelect: document.getElementById('compare-city-select'),
   compareZoneSelect: document.getElementById('compare-zone-select'),
   btnPinZone:        document.getElementById('btn-pin-zone'),

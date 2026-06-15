@@ -1881,8 +1881,15 @@ body::before {
 }
 
 .compare-picker-row .select-wrapper {
-  flex: 1 1 150px;
+  flex: 1 1 130px;
 }
+
+/* States that have no zone data — dimmed in the dropdown */
+option.state-no-data {
+  color: #666;
+  font-style: italic;
+}
+
 
 .pinned-chips {
   display: flex;

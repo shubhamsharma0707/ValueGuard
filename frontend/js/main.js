@@ -1,16 +1,38 @@
 import { dom } from './dom.js';
-import { state } from './state.js';
+import { state, INDIAN_STATES, CITY_STATE_MAP } from './state.js';
 import { debounce, speculationLabel } from './utils.js';
 import { fetchLocationsAPI, submitValuationAPI, fetchHistoryAPI } from './api.js';
 import { updateSensitivityChart, renderRadarChart, refreshChartsTheme } from './charts.js';
 import {
   showError, hideError, showSkeleton, initTheme, initIcons,
-  toggleTheme, openSidebar, closeSidebar, filterZonesByCity,
+  toggleTheme, openSidebar, closeSidebar,
+  filterCitiesByState, filterZonesByCity,
   updateResults, resetResultCards, renderHistory, renderHeatmap,
   computeEMI, renderPinnedChips, renderCompareTable,
   showToast,
   initTicker, initScrollIndicator
 } from './ui.js';
+
+/* ─── Populate State Dropdowns ─────────────────────────────────────── */
+
+function populateStateDropdowns() {
+  [dom.stateSelect, dom.compareStateSelect].forEach((el) => {
+    if (!el) return;
+    el.innerHTML = '<option value="">— Select State —</option>';
+    INDIAN_STATES.forEach((s) => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      // Mark states that have data
+      const hasData = state.locations.some((loc) => (CITY_STATE_MAP[loc.city] || '') === s);
+      if (!hasData) opt.classList.add('state-no-data');
+      el.appendChild(opt);
+    });
+    el.disabled = false;
+  });
+}
+
+/* ─── Fetch Locations ──────────────────────────────────────────────── */
 
 async function fetchLocations() {
   try {
@@ -18,65 +40,58 @@ async function fetchLocations() {
     state.locations = data;
     hideError();
 
-    const cities = [...new Set(data.map((loc) => loc.city))];
-
-    dom.citySelect.innerHTML = '<option value="">— Select City —</option>';
-    cities.forEach((city) => {
-      const opt = document.createElement('option');
-      opt.value = city;
-      opt.textContent = city;
-      dom.citySelect.appendChild(opt);
-    });
-    dom.citySelect.disabled = false;
-
-    dom.compareCitySelect.innerHTML = '<option value="">— Select City —</option>';
-    cities.forEach((city) => {
-      const opt = document.createElement('option');
-      opt.value = city;
-      opt.textContent = city;
-      dom.compareCitySelect.appendChild(opt);
-    });
-
+    populateStateDropdowns();
     applyURLParams();
 
   } catch (err) {
     console.error('[ValueGuard] Failed to load locations:', err);
-    dom.citySelect.innerHTML = '<option value="">Server unavailable</option>';
+    dom.stateSelect.innerHTML = '<option value="">Server unavailable</option>';
     showError('Cannot reach the server at localhost:3000. Run: npm run dev');
   }
 }
 
+/* ─── URL State Encoding ───────────────────────────────────────────── */
+
 function encodeURLState() {
   const params = new URLSearchParams({
-    city:  dom.citySelect.value || '',
-    zone:  dom.zoneSelect.value || '',
+    state: dom.stateSelect.value || '',
+    city:  dom.citySelect.value  || '',
+    zone:  dom.zoneSelect.value  || '',
     age:   dom.sliderAge.value,
     metro: dom.sliderMetro.value,
     spec:  dom.sliderSpeculation.value,
   });
-  const url = `${window.location.pathname}?${params.toString()}`;
-  window.history.replaceState({}, '', url);
+  window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
 }
 
 function applyURLParams() {
-  const params = new URLSearchParams(window.location.search);
-  const city   = params.get('city');
-  const zone   = params.get('zone');
-  const age    = params.get('age');
-  const metro  = params.get('metro');
-  const spec   = params.get('spec');
+  const params   = new URLSearchParams(window.location.search);
+  const statePrm = params.get('state');
+  const city     = params.get('city');
+  const zone     = params.get('zone');
+  const age      = params.get('age');
+  const metro    = params.get('metro');
+  const spec     = params.get('spec');
 
-  if (city && dom.citySelect.querySelector(`option[value="${CSS.escape(city)}"]`)) {
-
-    dom.citySelect.value = city;
-    filterZonesByCity(city, dom.zoneSelect);
-    renderHeatmap(city);
-    filterZonesByCity(city, dom.compareZoneSelect);
-  }
-
-  if (age)   { dom.sliderAge.value = age; dom.valAge.textContent = `${age} yr${age === '1' ? '' : 's'}`; }
+  if (age)   { dom.sliderAge.value = age;   dom.valAge.textContent = `${age} yr${age === '1' ? '' : 's'}`; }
   if (metro) { dom.sliderMetro.value = metro; dom.valMetro.textContent = `${Number(metro).toFixed(1)} km`; }
   if (spec)  { dom.sliderSpeculation.value = spec; dom.valSpeculation.textContent = speculationLabel(Number(spec)); }
+
+  if (statePrm && dom.stateSelect.querySelector(`option[value="${CSS.escape(statePrm)}"]`)) {
+    dom.stateSelect.value = statePrm;
+    filterCitiesByState(statePrm, dom.citySelect, dom.zoneSelect);
+    renderHeatmap(null); // clear until city chosen
+  }
+
+  if (city) {
+    setTimeout(() => {
+      if (dom.citySelect.querySelector(`option[value="${CSS.escape(city)}"]`)) {
+        dom.citySelect.value = city;
+        filterZonesByCity(city, dom.zoneSelect);
+        renderHeatmap(city);
+      }
+    }, 30);
+  }
 
   if (zone) {
     setTimeout(() => {
@@ -84,9 +99,11 @@ function applyURLParams() {
         dom.zoneSelect.value = zone;
         submitValuation();
       }
-    }, 50);
+    }, 60);
   }
 }
+
+/* ─── History ──────────────────────────────────────────────────────── */
 
 async function fetchHistory() {
   try {
@@ -97,13 +114,15 @@ async function fetchHistory() {
   }
 }
 
+/* ─── Valuation ────────────────────────────────────────────────────── */
+
 async function submitValuation() {
   const locationId = dom.zoneSelect.value;
   if (!locationId) return;
 
   const payload = {
-    location_id:     locationId,
-    property_age:    Number(dom.sliderAge.value),
+    location_id:       locationId,
+    property_age:      Number(dom.sliderAge.value),
     metro_distance_km: Number(dom.sliderMetro.value),
     speculation_level: Number(dom.sliderSpeculation.value),
   };
@@ -113,20 +132,13 @@ async function submitValuation() {
 
   try {
     const data = await submitValuationAPI(payload);
-    
     state.lastResult = { ...data, location_id: locationId };
     updateResults(data);
     await fetchHistory();
     updateSensitivityChart();
     encodeURLState();
 
-    if (document.getElementById('tab-trends') && document.getElementById('tab-trends').classList.contains('active')) {
-      // trends tab removed
-    }
-
-    if (dom.emiBody && !dom.emiBody.hidden) {
-      computeEMI();
-    }
+    if (dom.emiBody && !dom.emiBody.hidden) computeEMI();
 
   } catch (err) {
     console.error('[ValueGuard] Valuation error:', err);
@@ -135,11 +147,13 @@ async function submitValuation() {
   }
 }
 
+/* ─── Compare helpers ──────────────────────────────────────────────── */
+
 function formulaEstimate(loc, age, metroKm, specLevel) {
-  const base     = loc.circle_rate_per_sqft * loc.zone_multiplier;
-  const metro    = loc.metro_nearby && metroKm < 2 ? 800 : loc.metro_nearby && metroKm < 5 ? 400 : 0;
-  const deprec   = age * 120;
-  const uplift   = specLevel * 500;
+  const base   = loc.circle_rate_per_sqft * loc.zone_multiplier;
+  const metro  = loc.metro_nearby && metroKm < 2 ? 800 : loc.metro_nearby && metroKm < 5 ? 400 : 0;
+  const deprec = age * 120;
+  const uplift = specLevel * 500;
   return Math.round(base + metro - deprec + uplift);
 }
 
@@ -166,25 +180,21 @@ function pinZone() {
   const loc = state.locations.find((l) => l.id === locationId);
   if (!loc) return;
 
-  const age     = Number(dom.sliderAge.value);
-  const metroKm = Number(dom.sliderMetro.value);
-  const spec    = Number(dom.sliderSpeculation.value);
-  const market  = formulaEstimate(loc, age, metroKm, spec);
+  const age      = Number(dom.sliderAge.value);
+  const metroKm  = Number(dom.sliderMetro.value);
+  const spec     = Number(dom.sliderSpeculation.value);
+  const market   = formulaEstimate(loc, age, metroKm, spec);
   const variance = parseFloat((((market - loc.circle_rate_per_sqft) / loc.circle_rate_per_sqft) * 100).toFixed(2));
-  const risk    = variance < 20 ? 'Safe' : variance <= 50 ? 'Caution' : 'High Risk';
+  const risk     = variance < 20 ? 'Safe' : variance <= 50 ? 'Caution' : 'High Risk';
 
-  state.pinnedZones.push({
-    ...loc,
-    market_value: market,
-    variance_pct: variance,
-    risk_level:   risk,
-  });
-
+  state.pinnedZones.push({ ...loc, market_value: market, variance_pct: variance, risk_level: risk });
   renderPinnedChips(unpinZone);
   renderCompareTable();
   renderRadarChart();
   showToast(`Pinned ${loc.zone_name}`);
 }
+
+/* ─── Share URL ────────────────────────────────────────────────────── */
 
 async function copyShareURL() {
   encodeURLState();
@@ -196,6 +206,8 @@ async function copyShareURL() {
   }
 }
 
+/* ─── Tabs ─────────────────────────────────────────────────────────── */
+
 function initTabs() {
   const tabBtns   = document.querySelectorAll('.tab-btn');
   const tabPanels = document.querySelectorAll('.tab-panel');
@@ -204,24 +216,17 @@ function initTabs() {
     btn.addEventListener('click', () => {
       tabBtns.forEach((b) => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
       tabPanels.forEach((p) => p.classList.remove('active'));
-
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
-      const panelId = btn.getAttribute('aria-controls');
-      document.getElementById(panelId).classList.add('active');
-
-      if (panelId === 'tab-trends') {
-        // Trends section removed
-      }
+      document.getElementById(btn.getAttribute('aria-controls')).classList.add('active');
     });
   });
 }
 
+/* ─── Slider fills ─────────────────────────────────────────────────── */
+
 function updateSliderFill(el) {
-  const min = Number(el.min);
-  const max = Number(el.max);
-  const val = Number(el.value);
-  const pct = ((val - min) / (max - min)) * 100;
+  const pct = ((Number(el.value) - Number(el.min)) / (Number(el.max) - Number(el.min))) * 100;
   el.style.background = `linear-gradient(to right, var(--clr-accent) ${pct}%, var(--clr-surface-3) ${pct}%)`;
 }
 
@@ -232,22 +237,18 @@ function initSliderReadouts() {
     dom.sliderAge.setAttribute('aria-valuenow', v);
     updateSliderFill(dom.sliderAge);
   });
-
   dom.sliderMetro.addEventListener('input', () => {
     const v = Number(dom.sliderMetro.value).toFixed(1);
     dom.valMetro.textContent = `${v} km`;
     dom.sliderMetro.setAttribute('aria-valuenow', v);
     updateSliderFill(dom.sliderMetro);
   });
-
   dom.sliderSpeculation.addEventListener('input', () => {
     const v = dom.sliderSpeculation.value;
     dom.valSpeculation.textContent = speculationLabel(Number(v));
     dom.sliderSpeculation.setAttribute('aria-valuenow', v);
     updateSliderFill(dom.sliderSpeculation);
   });
-
-  // Initialize fills on page load
   requestAnimationFrame(() => {
     updateSliderFill(dom.sliderAge);
     updateSliderFill(dom.sliderMetro);
@@ -255,78 +256,99 @@ function initSliderReadouts() {
   });
 }
 
+/* ─── Reveal animations ────────────────────────────────────────────── */
+
 function initRevealAnimations() {
   const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          observer.unobserve(entry.target);
-        }
-      });
-    },
+    (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('revealed'); observer.unobserve(e.target); } }),
     { threshold: 0.1 }
   );
   document.querySelectorAll('.reveal-card').forEach((el) => observer.observe(el));
 }
 
+/* ─── Event Listeners ──────────────────────────────────────────────── */
+
 const debouncedValuate = debounce(submitValuation, 300);
 
 function initEventListeners() {
-  dom.citySelect.addEventListener('change', () => {
-    filterZonesByCity(dom.citySelect.value, dom.zoneSelect);
-    renderHeatmap(dom.citySelect.value);
+  // ── Main: State → City → Zone cascade ──
+  dom.stateSelect.addEventListener('change', () => {
+    const s = dom.stateSelect.value;
+    filterCitiesByState(s, dom.citySelect, dom.zoneSelect);
+    renderHeatmap(null);
     resetResultCards();
   });
+
+  dom.citySelect.addEventListener('change', () => {
+    const city = dom.citySelect.value;
+    filterZonesByCity(city, dom.zoneSelect);
+    renderHeatmap(city);
+    resetResultCards();
+  });
+
   dom.zoneSelect.addEventListener('change', debouncedValuate);
 
+  // ── Sliders ──
   dom.sliderAge.addEventListener('input', debouncedValuate);
   dom.sliderMetro.addEventListener('input', debouncedValuate);
   dom.sliderSpeculation.addEventListener('input', debouncedValuate);
+
+  // ── Compare: State → City → Zone cascade ──
+  dom.compareStateSelect.addEventListener('change', () => {
+    filterCitiesByState(dom.compareStateSelect.value, dom.compareCitySelect, dom.compareZoneSelect);
+    dom.btnPinZone.disabled = true;
+  });
 
   dom.compareCitySelect.addEventListener('change', () => {
     filterZonesByCity(dom.compareCitySelect.value, dom.compareZoneSelect);
     dom.btnPinZone.disabled = true;
   });
+
   dom.compareZoneSelect.addEventListener('change', () => {
     dom.btnPinZone.disabled = !dom.compareZoneSelect.value;
   });
+
   dom.btnPinZone.addEventListener('click', pinZone);
 
+  // ── History drawer ──
   dom.drawerToggle.addEventListener('click', () => {
     const isOpen = dom.historyDrawer.classList.toggle('open');
     dom.drawerToggle.setAttribute('aria-expanded', String(isOpen));
   });
 
+  // ── Actions ──
   dom.btnCopyURL.addEventListener('click', copyShareURL);
   dom.btnPrint.addEventListener('click', () => {
     dom.printTimestamp.textContent = `Generated: ${new Date().toLocaleString('en-IN')}`;
     window.print();
   });
 
+  // ── Theme & mobile ──
   dom.themeToggle.addEventListener('click', toggleTheme);
-
   dom.hamburgerBtn.addEventListener('click', () => {
-    const isOpen = dom.sidebar.classList.contains('open');
-    isOpen ? closeSidebar() : openSidebar();
+    dom.sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
   });
   dom.sidebarOverlay.addEventListener('click', closeSidebar);
 
+  // ── EMI ──
   dom.emiToggle.addEventListener('click', () => {
     const expanded = dom.emiToggle.getAttribute('aria-expanded') === 'true';
     dom.emiToggle.setAttribute('aria-expanded', String(!expanded));
     dom.emiBody.hidden = expanded;
     if (!expanded && state.lastResult) computeEMI();
   });
-
   [dom.emiArea, dom.emiRate, dom.emiTenure, dom.emiIncome].forEach((el) => {
     el.addEventListener('input', debounce(computeEMI, 300));
   });
 
+  // ── Sensitivity ──
   dom.sensitivityAxis.addEventListener('change', updateSensitivityChart);
-  
+
+  // ── Theme change ──
   window.addEventListener('themeChanged', refreshChartsTheme);
 }
+
+/* ─── Init ─────────────────────────────────────────────────────────── */
 
 async function init() {
   initTheme();

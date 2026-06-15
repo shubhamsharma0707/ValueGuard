@@ -75,16 +75,25 @@
       <h2 class="sidebar-title" id="location-section-title">Location</h2>
 
       <div class="field-group">
-        <label class="field-label" for="city-select">City</label>
+        <label class="field-label" for="state-select">State</label>
         <div class="select-wrapper">
-          <select id="city-select" aria-label="Select city">
-            <option value="">— Loading cities… —</option>
+          <select id="state-select" aria-label="Select state" disabled>
+            <option value="">— Loading… —</option>
           </select>
         </div>
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="zone-select">Zone</label>
+        <label class="field-label" for="city-select">City</label>
+        <div class="select-wrapper">
+          <select id="city-select" aria-label="Select city" disabled>
+            <option value="">— Select a state first —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="zone-select">Zone / Area</label>
         <div class="select-wrapper">
           <select id="zone-select" aria-label="Select zone" disabled>
             <option value="">— Select a city first —</option>
@@ -426,7 +435,12 @@
       <div class="compare-picker glass-card">
         <div class="compare-picker-row">
           <div class="select-wrapper">
-            <select id="compare-city-select" aria-label="Select city to add zone">
+            <select id="compare-state-select" aria-label="Select state to add zone" disabled>
+              <option value="">— Select State —</option>
+            </select>
+          </div>
+          <div class="select-wrapper">
+            <select id="compare-city-select" aria-label="Select city to add zone" disabled>
               <option value="">— Select City —</option>
             </select>
           </div>

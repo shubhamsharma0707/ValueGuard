@@ -1,5 +1,5 @@
 import { dom } from './dom.js';
-import { state } from './state.js';
+import { state, CITY_STATE_MAP } from './state.js';
 import { formatINR, riskClass, escapeHTML, speculationLabel, iconSVG, riskIconSVG } from './utils.js';
 import { updateChart, updateEMIChart, renderRadarChart } from './charts.js';
 
@@ -169,6 +169,36 @@ export function animateNumber(el, target, prefix = '', duration = 400) {
   el.classList.add('number-flip');
   setTimeout(() => el.classList.remove('number-flip'), 400);
   requestAnimationFrame(step);
+}
+
+export function filterCitiesByState(selectedState, cityEl, zoneEl) {
+  cityEl.innerHTML = '<option value="">— Select City —</option>';
+  cityEl.disabled = true;
+  if (zoneEl) {
+    zoneEl.innerHTML = '<option value="">— Select City first —</option>';
+    zoneEl.disabled = true;
+  }
+  if (!selectedState) return;
+
+  // Cities that have data AND belong to the selected state
+  const cities = [...new Set(
+    state.locations
+      .filter((loc) => (CITY_STATE_MAP[loc.city] || '') === selectedState)
+      .map((loc) => loc.city)
+  )].sort();
+
+  if (!cities.length) {
+    cityEl.innerHTML = '<option value="">— No data for this state —</option>';
+    return;
+  }
+
+  cities.forEach((city) => {
+    const opt = document.createElement('option');
+    opt.value = city;
+    opt.textContent = city;
+    cityEl.appendChild(opt);
+  });
+  cityEl.disabled = false;
 }
 
 export function filterZonesByCity(city, zoneEl) {
