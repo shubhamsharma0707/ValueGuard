@@ -51,14 +51,17 @@ const RAILWAY_ORIGIN_RE = /^https:\/\/[a-z0-9-]+\.railway\.app$/i;
 app.use(
   cors({
     origin: (origin, cb) => {
+      console.log('[CORS Debug] Request from origin:', origin);
       if (!origin) return cb(null, true); // same-origin / curl / Postman
       if (
         /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
         RAILWAY_ORIGIN_RE.test(origin)
       ) {
+        console.log('[CORS Debug] Allowed origin:', origin);
         return cb(null, true);
       }
-      cb(new Error('CORS: origin not allowed'));
+      console.error('[CORS Debug] Blocked origin:', origin);
+      cb(new Error(`CORS: origin ${origin} not allowed`));
     },
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type'],
