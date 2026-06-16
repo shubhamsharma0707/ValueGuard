@@ -46,7 +46,7 @@ app.use(
 // ─── CORS ───────────────────────────────────────────────────────────────────
 // Allow: same-origin (no Origin header), localhost dev servers, and any
 // *.railway.app subdomain so Railway's own domain can call the API.
-const RAILWAY_ORIGIN_RE = /^https:\/\/[a-z0-9-]+\.railway\.app$/i;
+const RAILWAY_ORIGIN_RE = /^https:\/\/[a-z0-9-]+(?:\.up)?\.railway\.app$/i;
 
 app.use(
   cors({
