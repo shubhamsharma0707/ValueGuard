@@ -275,12 +275,6 @@ All circle rates are sourced from official government portals:
 
 ---
 
-## Screenshot
-
-![ValueGuard Dashboard](screenshot.png)
-
----
-
 ## License
 
 MIT
