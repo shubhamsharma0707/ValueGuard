@@ -7,7 +7,8 @@
 'use strict';
 
 // Load .env for local dev; in production (Railway) env vars are injected by the platform.
-require('dotenv').config();
+// Use override: true so that local backend/.env PORT always takes precedence over local shell variables.
+require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
 
 const express    = require('express');
 const cors       = require('cors');
