@@ -116,15 +116,22 @@ app.use((err, req, res, next) => {
 // On Vercel the file is imported as a module; app.listen() must not be called.
 // require.main === module is true only when run directly via `node server.js`.
 if (require.main === module) {
-  // Bind to 0.0.0.0 so Railway's internal proxy can reach the server.
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`ValueGuard running at http://localhost:${PORT}`);
+  // Listen on port 3000 by default (for local dev and standard Railway routing)
+  app.listen(3000, '0.0.0.0', () => {
+    console.log(`ValueGuard running at http://localhost:3000`);
     console.log(`   Endpoints:`);
-    console.log(`   GET  http://localhost:${PORT}/api/locations`);
-    console.log(`   POST http://localhost:${PORT}/api/valuate`);
-    console.log(`   GET  http://localhost:${PORT}/api/history`);
-    console.log(`   GET  http://localhost:${PORT}/api/trends/:location_id`);
+    console.log(`   GET  http://localhost:3000/api/locations`);
+    console.log(`   POST http://localhost:3000/api/valuate`);
+    console.log(`   GET  http://localhost:3000/api/history`);
+    console.log(`   GET  http://localhost:3000/api/trends/:location_id`);
   });
+
+  // Also listen on the injected process.env.PORT if it's different (e.g. 8080 on Railway)
+  if (process.env.PORT && process.env.PORT !== '3000') {
+    app.listen(process.env.PORT, '0.0.0.0', () => {
+      console.log(`ValueGuard also running at http://localhost:${process.env.PORT}`);
+    });
+  }
 }
 
 // ─── Export for Vercel serverless runtime ────────────────────────────────────
