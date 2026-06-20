@@ -1133,6 +1133,212 @@ input[type="range"]::-moz-range-thumb {
 .footer-bottom-link:hover { color: var(--ink); }
 
 /* ──────────────────────────────────────────────
+   EMI CALCULATOR
+────────────────────────────────────────────── */
+.emi-wrap {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: 0;
+  overflow: hidden;
+  margin-top: 16px;
+}
+.emi-header {
+  padding: 24px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: background 0.2s;
+}
+.emi-header:hover {
+  background: rgba(28,20,16,0.02);
+}
+.emi-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.emi-toggle-icon {
+  font-size: 1rem;
+  color: var(--ink-muted);
+  transition: transform 0.3s;
+}
+.emi-header[aria-expanded="true"] .emi-toggle-icon {
+  transform: rotate(180deg);
+}
+.emi-body {
+  padding: 0 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.emi-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(28,20,16,0.06);
+}
+.emi-input {
+  width: 100%;
+  appearance: none;
+  background: var(--bg);
+  border: 1.5px solid rgba(28,20,16,0.12);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.9375rem;
+  color: var(--ink);
+  transition: border-color 0.2s;
+}
+.emi-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212,97,74,0.15);
+}
+.emi-results-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.emi-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.emi-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.emi-stat-val {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.emi-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(28,20,16,0.08);
+  color: var(--ink-muted);
+  width: fit-content;
+}
+.emi-badge.affordable { background: rgba(76,168,140,0.2); color: #2e7d6b; }
+.emi-badge.stretch    { background: rgba(196,168,75,0.25); color: #8a6e1a; }
+.emi-badge.burden     { background: rgba(212,97,74,0.2); color: #a83520; }
+.emi-chart-wrap {
+  height: 220px;
+  position: relative;
+}
+
+/* ──────────────────────────────────────────────
+   COMPARE ZONES
+────────────────────────────────────────────── */
+.compare-section {
+  padding: 80px 32px 80px;
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+.compare-shell {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.compare-controls {
+  position: sticky;
+  top: calc(var(--nav-h) + 16px);
+}
+.pinned-chips-wrap {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(28,20,16,0.06);
+}
+.pinned-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pinned-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(28,20,16,0.05);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.pinned-chip button {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink-faint);
+  transition: background 0.2s, color 0.2s;
+}
+.pinned-chip button:hover {
+  background: rgba(28,20,16,0.1);
+  color: var(--ink);
+}
+.pinned-chip button svg {
+  width: 14px; height: 14px;
+}
+.compare-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.compare-table-wrap {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  overflow-x: auto;
+}
+.compare-empty {
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  text-align: center;
+  padding: 40px 0;
+}
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.compare-table th, .compare-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(28,20,16,0.06);
+}
+.compare-table th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+}
+.radar-chart-wrap {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  height: 400px;
+  position: relative;
+}
+
+/* ──────────────────────────────────────────────
    RESPONSIVE
 ────────────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -1145,6 +1351,7 @@ input[type="range"]::-moz-range-thumb {
   #bento-heatmap     { grid-column: 2 / 3; grid-row: 3; }
 
   .tool-shell { grid-template-columns: 280px 1fr; }
+  .compare-shell { grid-template-columns: 280px 1fr; }
   .use-case-grid { grid-template-columns: 1fr; }
   .stats-inner { flex-wrap: wrap; gap: 32px; }
   .stat-divider { display: none; }
@@ -1171,9 +1378,12 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .tool-shell { grid-template-columns: 1fr; }
-  .tool-controls { position: static; }
+  .compare-shell { grid-template-columns: 1fr; }
+  .tool-controls, .compare-controls { position: static; }
 
   .result-cards { grid-template-columns: 1fr 1fr; }
+  .emi-controls { grid-template-columns: 1fr; }
+  .emi-results-grid { grid-template-columns: 1fr 1fr; }
 
   .use-case-grid { grid-template-columns: 1fr; }
   .cta-shapes { gap: 8px; }
@@ -1183,7 +1393,7 @@ input[type="range"]::-moz-range-thumb {
   .footer-links { grid-template-columns: 1fr 1fr; gap: 32px; }
   .footer-bottom { flex-wrap: wrap; gap: 12px; }
 
-  .features, .tool-section, .value-props,
+  .features, .tool-section, .compare-section, .value-props,
   .use-cases, .trusted, .cta-section {
     padding-left: 20px;
     padding-right: 20px;
@@ -1196,6 +1406,7 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 480px) {
   .hero-heading { font-size: 2rem; }
   .result-cards { grid-template-columns: 1fr; }
+  .emi-results-grid { grid-template-columns: 1fr; }
   .hero-cta-row { flex-direction: column; align-items: stretch; }
   .btn-cta, .btn-ghost { text-align: center; justify-content: center; }
   .stats-inner { grid-template-columns: 1fr 1fr; display: grid; }

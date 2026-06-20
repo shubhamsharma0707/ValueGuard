@@ -418,6 +418,115 @@
           <canvas id="comparison-chart" aria-label="Bar chart comparing circle rate, market rate, and city average"></canvas>
         </div>
       </div>
+
+      <!-- EMI Calculator -->
+      <div class="emi-wrap">
+        <div class="emi-header" id="emi-toggle" role="button" tabindex="0" aria-expanded="false">
+          <span class="emi-title">EMI & Affordability</span>
+          <span class="emi-toggle-icon">▾</span>
+        </div>
+        <div class="emi-body" id="emi-body" hidden>
+          <div class="emi-controls">
+            <div class="tool-control-group">
+              <label class="tool-label" for="emi-area">Area (sqft)</label>
+              <input type="number" id="emi-area" class="emi-input" value="1000" />
+            </div>
+            <div class="tool-control-group">
+              <label class="tool-label" for="emi-rate">Interest Rate (%)</label>
+              <input type="number" id="emi-rate" class="emi-input" value="8.5" step="0.1" />
+            </div>
+            <div class="tool-control-group">
+              <label class="tool-label" for="emi-tenure">Tenure (Years)</label>
+              <input type="number" id="emi-tenure" class="emi-input" value="20" />
+            </div>
+            <div class="tool-control-group">
+              <label class="tool-label" for="emi-income">Monthly Income (₹)</label>
+              <input type="number" id="emi-income" class="emi-input" value="150000" step="10000" />
+            </div>
+          </div>
+          <div class="emi-results-grid">
+            <div class="emi-stat">
+              <span class="emi-stat-label">Loan Amount</span>
+              <span class="emi-stat-val" id="emi-loan-amount">—</span>
+            </div>
+            <div class="emi-stat">
+              <span class="emi-stat-label">Monthly EMI</span>
+              <span class="emi-stat-val" id="emi-monthly">—</span>
+            </div>
+            <div class="emi-stat">
+              <span class="emi-stat-label">Total Interest</span>
+              <span class="emi-stat-val" id="emi-interest">—</span>
+            </div>
+            <div class="emi-stat">
+              <span class="emi-stat-label">Affordability</span>
+              <span class="emi-badge" id="emi-badge">—</span>
+            </div>
+          </div>
+          <div class="emi-chart-wrap">
+            <canvas id="emi-chart" aria-label="Donut chart showing principal and interest"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     COMPARE ZONES SECTION
+══════════════════════════════════════════════════════════ -->
+<section class="compare-section" id="compare" aria-labelledby="compare-title">
+  <h2 class="section-heading" id="compare-title">Multi-zone Comparison</h2>
+  <p class="section-sub">Pin up to 3 zones to compare them side-by-side using a unified benchmark.</p>
+
+  <div class="compare-shell">
+    <div class="compare-controls tool-controls">
+      <div class="tool-control-group">
+        <label class="tool-label" for="c-state">State</label>
+        <div class="select-wrap">
+          <select id="c-state" aria-label="Select state">
+            <option value="">— Loading… —</option>
+          </select>
+          <span class="select-arrow" aria-hidden="true">▾</span>
+        </div>
+      </div>
+      <div class="tool-control-group">
+        <label class="tool-label" for="c-city">City</label>
+        <div class="select-wrap">
+          <select id="c-city" aria-label="Select city" disabled>
+            <option value="">— Select a state —</option>
+          </select>
+          <span class="select-arrow" aria-hidden="true">▾</span>
+        </div>
+      </div>
+      <div class="tool-control-group">
+        <label class="tool-label" for="c-zone">Zone / Area</label>
+        <div class="select-wrap">
+          <select id="c-zone" aria-label="Select zone" disabled>
+            <option value="">— Select a city —</option>
+          </select>
+          <span class="select-arrow" aria-hidden="true">▾</span>
+        </div>
+      </div>
+      <div class="tool-actions">
+        <button class="btn-cta btn-full" id="btn-pin" disabled aria-label="Pin zone">Pin Zone</button>
+      </div>
+
+      <div class="pinned-chips-wrap">
+        <span class="tool-label" style="display:block;margin-bottom:8px;">Pinned Zones</span>
+        <div class="pinned-chips" id="pinned-chips">
+          <span style="font-size:0.7rem;opacity:0.5">No zones pinned yet</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-results">
+      <div class="compare-table-wrap" id="compare-table-wrap">
+        <div class="compare-empty">Pin at least one zone to start comparing.</div>
+      </div>
+      <div class="radar-chart-wrap" id="radar-chart-wrap">
+        <canvas id="radar-chart" aria-label="Radar chart comparing multiple zones"></canvas>
+      </div>
     </div>
   </div>
 </section>

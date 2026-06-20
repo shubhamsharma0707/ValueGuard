@@ -76,29 +76,29 @@ function buildDom() {
     sidebar:           null,
     sidebarOverlay:    null,
 
-    // ── EMI — not in new layout, safe stubs
-    emiToggle:         null,
-    emiBody:           null,
-    emiArea:           null,
-    emiRate:           null,
-    emiTenure:         null,
-    emiIncome:         null,
-    emiLoanAmount:     null,
-    emiMonthly:        null,
-    emiInterest:       null,
-    emiBadge:          null,
+    // ── EMI
+    emiToggle:         document.getElementById('emi-toggle'),
+    emiBody:           document.getElementById('emi-body'),
+    emiArea:           document.getElementById('emi-area'),
+    emiRate:           document.getElementById('emi-rate'),
+    emiTenure:         document.getElementById('emi-tenure'),
+    emiIncome:         document.getElementById('emi-income'),
+    emiLoanAmount:     document.getElementById('emi-loan-amount'),
+    emiMonthly:        document.getElementById('emi-monthly'),
+    emiInterest:       document.getElementById('emi-interest'),
+    emiBadge:          document.getElementById('emi-badge'),
 
     // ── Sensitivity
     sensitivityAxis:   null,
     sensitivityHint:   null,
 
     // ── Compare zone panel
-    compareStateSelect: null,
-    compareCitySelect:  null,
-    compareZoneSelect:  null,
-    btnPinZone:         null,
-    pinnedChips:        null,
-    compareTableWrap:   null,
+    compareStateSelect: document.getElementById('c-state'),
+    compareCitySelect:  document.getElementById('c-city'),
+    compareZoneSelect:  document.getElementById('c-zone'),
+    btnPinZone:         document.getElementById('btn-pin'),
+    pinnedChips:        document.getElementById('pinned-chips'),
+    compareTableWrap:   document.getElementById('compare-table-wrap'),
 
     // ── Main panel
     mainPanel:          document.getElementById('tool'),
