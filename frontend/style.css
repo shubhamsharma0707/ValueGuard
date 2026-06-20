@@ -129,6 +129,35 @@ select, input { font: inherit; }
 }
 .btn-ghost:hover { background: rgba(28,20,16,0.14); }
 
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  border: 1px solid rgba(28,20,16,0.08);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+.btn-icon:hover {
+  background: rgba(28,20,16,0.06);
+  transform: translateY(-2px);
+}
+.btn-icon svg {
+  width: 20px;
+  height: 20px;
+}
+[data-theme="dark"] .btn-icon {
+  border-color: rgba(255,255,255,0.1);
+  background: var(--bg-card);
+}
+[data-theme="dark"] .btn-icon:hover {
+  background: rgba(255,255,255,0.06);
+}
+
 /* ──────────────────────────────────────────────
    NAVIGATION
 ────────────────────────────────────────────── */
