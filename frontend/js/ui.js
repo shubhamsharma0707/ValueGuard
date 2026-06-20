@@ -8,7 +8,6 @@ let toastTimer;
 
 export function initTicker() {
   if (!dom.tickerTrack || !state.locations.length) return;
-
   const items = buildTickerItems();
   renderTicker(items);
 }
@@ -92,65 +91,57 @@ export function initIcons() {
 
 export function showToast(message, duration = 2500) {
   clearTimeout(toastTimer);
+  if (!dom.toast) return;
   dom.toast.textContent = message;
   dom.toast.classList.add('visible');
   toastTimer = setTimeout(() => dom.toast.classList.remove('visible'), duration);
 }
 
 export function showError(message) {
-  dom.errorMessage.textContent = message;
-  dom.errorBanner.classList.add('visible');
+  if (dom.errorMessage) dom.errorMessage.textContent = message;
+  if (dom.errorBanner) dom.errorBanner.classList.add('visible');
+  // Also log to console in new layout
+  console.warn('[ValueGuard Error]', message);
 }
 
 export function hideError() {
-  dom.errorBanner.classList.remove('visible');
+  if (dom.errorBanner) dom.errorBanner.classList.remove('visible');
 }
 
 export function showSkeleton() {
-  dom.circleRateValue.innerHTML = '<div class="skeleton-block skeleton"></div>';
-  dom.marketRateValue.innerHTML = '<div class="skeleton-block skeleton"></div>';
-  dom.circleRateZone.textContent = '';
-  dom.marketRateRisk.textContent = '';
+  if (dom.circleRateValue) dom.circleRateValue.textContent = '…';
+  if (dom.marketRateValue) dom.marketRateValue.textContent = '…';
+  if (dom.circleRateZone) dom.circleRateZone.textContent = '';
+  if (dom.marketRateRisk) dom.marketRateRisk.textContent = '';
 }
 
 export function initTheme() {
-  const saved = localStorage.getItem('vg-theme') || 'dark';
-  applyTheme(saved);
+  // New landing page doesn't use dark mode — keep light always
+  document.documentElement.removeAttribute('data-theme');
 }
 
 export function applyTheme(theme) {
-  if (theme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    dom.themeIcon.innerHTML = iconSVG('moon');
-    dom.themeToggle.setAttribute('aria-label', 'Switch to dark mode');
-  } else {
-    document.documentElement.removeAttribute('data-theme');
-    dom.themeIcon.innerHTML = iconSVG('sun');
-    dom.themeToggle.setAttribute('aria-label', 'Switch to light mode');
-  }
+  if (dom.themeIcon) dom.themeIcon.innerHTML = iconSVG(theme === 'light' ? 'moon' : 'sun');
+  if (dom.themeToggle) dom.themeToggle.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
   localStorage.setItem('vg-theme', theme);
   window.dispatchEvent(new Event('themeChanged'));
 }
 
 export function toggleTheme() {
-  const current = localStorage.getItem('vg-theme') || 'dark';
+  const current = localStorage.getItem('vg-theme') || 'light';
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
 export function openSidebar() {
-  dom.sidebar.classList.add('open');
-  dom.sidebarOverlay.classList.add('visible');
-  dom.sidebarOverlay.removeAttribute('aria-hidden');
-  dom.hamburgerBtn.classList.add('open');
-  dom.hamburgerBtn.setAttribute('aria-expanded', 'true');
+  if (dom.sidebar) dom.sidebar.classList.add('open');
+  if (dom.sidebarOverlay) { dom.sidebarOverlay.classList.add('visible'); dom.sidebarOverlay.removeAttribute('aria-hidden'); }
+  if (dom.hamburgerBtn) { dom.hamburgerBtn.classList.add('open'); dom.hamburgerBtn.setAttribute('aria-expanded', 'true'); }
 }
 
 export function closeSidebar() {
-  dom.sidebar.classList.remove('open');
-  dom.sidebarOverlay.classList.remove('visible');
-  dom.sidebarOverlay.setAttribute('aria-hidden', 'true');
-  dom.hamburgerBtn.classList.remove('open');
-  dom.hamburgerBtn.setAttribute('aria-expanded', 'false');
+  if (dom.sidebar) dom.sidebar.classList.remove('open');
+  if (dom.sidebarOverlay) { dom.sidebarOverlay.classList.remove('visible'); dom.sidebarOverlay.setAttribute('aria-hidden', 'true'); }
+  if (dom.hamburgerBtn) { dom.hamburgerBtn.classList.remove('open'); dom.hamburgerBtn.setAttribute('aria-expanded', 'false'); }
 }
 
 export function animateNumber(el, target, prefix = '', duration = 400) {
@@ -221,92 +212,106 @@ export function filterZonesByCity(city, zoneEl) {
 
 export function updateResults(data) {
   const cls = riskClass(data.risk_level);
-
   const circleNum = data.circle_rate;
   const marketNum = data.market_value;
 
-  dom.circleRateValue.className = 'card-value';
-  animateNumber(dom.circleRateValue, circleNum, '₹');
-  dom.circleRateZone.textContent = data.zone_name + ', ' + data.city;
+  // Rate cards
+  if (dom.circleRateValue) animateNumber(dom.circleRateValue, circleNum, '₹');
+  if (dom.circleRateZone)  dom.circleRateZone.textContent = data.zone_name + ', ' + data.city;
+  if (dom.marketRateValue) animateNumber(dom.marketRateValue, marketNum, '₹');
+  if (dom.marketRateRisk)  dom.marketRateRisk.textContent = `${data.variance_pct > 0 ? '+' : ''}${data.variance_pct}% variance`;
+  if (dom.cardMarket) dom.cardMarket.className = `result-card result-card--accent revealed risk-${cls}`;
 
-  dom.marketRateValue.className = `card-value ${cls}`;
-  animateNumber(dom.marketRateValue, marketNum, '₹');
-  dom.marketRateRisk.textContent = `${data.variance_pct > 0 ? '+' : ''}${data.variance_pct}% variance`;
-
-  dom.cardMarket.className = `rate-card glass-card reveal-card revealed risk-${cls}`;
-
+  // Variance gauge
   updateGauge(data.variance_pct, cls);
 
-  dom.riskBadge.textContent = data.risk_level;
-  dom.riskBadge.className   = `risk-badge ${cls}`;
+  // Risk pill
+  if (dom.riskBadge) {
+    dom.riskBadge.textContent = data.risk_level;
+    const riskMap = { 'Safe': 'risk-low', 'Caution': 'risk-medium', 'High Risk': 'risk-high', 'Extreme Risk': 'risk-extreme' };
+    dom.riskBadge.className = `risk-pill ${riskMap[data.risk_level] || ''}`;
+  }
 
-  dom.insightIcon.innerHTML = riskIconSVG(data.risk_level);
-  dom.insightText.textContent = data.reason_text;
-  dom.insightCard.className   = `insight-card glass-card reveal-card revealed ${cls}`;
+  // Insight box
+  if (dom.insightIcon) dom.insightIcon.textContent = riskIconEmoji(data.risk_level);
+  if (dom.insightText) dom.insightText.textContent = data.reason_text;
+  if (dom.insightCard) dom.insightCard.className = `insight-box ${cls}`;
 
-  dom.bdBase.textContent  = formatINR(data.breakdown.base);
-  dom.bdMetro.textContent = data.breakdown.metro_premium > 0
+  // Breakdown
+  if (dom.bdBase)  dom.bdBase.textContent  = formatINR(data.breakdown.base);
+  if (dom.bdMetro) dom.bdMetro.textContent = data.breakdown.metro_premium > 0
     ? `+${formatINR(data.breakdown.metro_premium)}`
     : formatINR(0);
-  dom.bdDepr.textContent  = `−${formatINR(data.breakdown.age_depreciation)}`;
-  dom.bdSpec.textContent  = `+${formatINR(data.breakdown.speculative_uplift)}`;
+  if (dom.bdDepr)  dom.bdDepr.textContent  = `−${formatINR(data.breakdown.age_depreciation)}`;
+  if (dom.bdSpec)  dom.bdSpec.textContent  = `+${formatINR(data.breakdown.speculative_uplift)}`;
 
+  // Chart
   updateChart(data);
 
-  dom.gaugeTrack.setAttribute('aria-valuenow', Math.min(data.variance_pct, 100));
+  if (dom.gaugeTrack) dom.gaugeTrack.setAttribute('aria-valuenow', Math.min(data.variance_pct, 100));
+
+  // Enable btn
+  const btn = document.getElementById('btn-valuate');
+  if (btn) btn.textContent = 'Rerun Valuation';
+}
+
+function riskIconEmoji(level) {
+  switch(level) {
+    case 'Safe': return '✅';
+    case 'Caution': return '⚠️';
+    case 'High Risk': return '🔴';
+    case 'Extreme Risk': return '🚨';
+    default: return '💡';
+  }
 }
 
 export function resetResultCards() {
-  dom.circleRateValue.textContent = '—';
-  dom.marketRateValue.textContent = '—';
-  dom.cardMarket.className = 'rate-card glass-card reveal-card revealed';
-  dom.gaugeFill.style.width = '0%';
-  dom.gaugeFill.textContent = '0%';
-  dom.gaugeFill.className = 'gauge-fill';
-  dom.riskBadge.textContent = '—';
-  dom.riskBadge.className = 'risk-badge default';
+  if (dom.circleRateValue) dom.circleRateValue.textContent = '—';
+  if (dom.marketRateValue) dom.marketRateValue.textContent = '—';
+  if (dom.cardMarket) dom.cardMarket.className = 'result-card result-card--accent';
+  if (dom.gaugeFill) { dom.gaugeFill.style.width = '0%'; dom.gaugeFill.className = 'variance-fill'; }
+  if (dom.riskBadge) { dom.riskBadge.textContent = '—'; dom.riskBadge.className = 'risk-pill'; }
 }
 
 function updateGauge(variancePct, cls) {
+  if (!dom.gaugeFill) return;
   const displayWidth = Math.min(Math.abs(variancePct), 100);
+  const colMap = { safe: '#4CA88C', caution: '#C4A84B', 'high-risk': '#D4614A', 'extreme-risk': '#8B0000' };
   requestAnimationFrame(() => {
     dom.gaugeFill.style.width = `${displayWidth}%`;
-    dom.gaugeFill.className    = `gauge-fill ${cls}`;
+    dom.gaugeFill.style.background = colMap[cls] || 'var(--accent)';
+    dom.gaugeFill.className = `variance-fill`;
   });
 }
 
 export function renderHistory(history) {
-  dom.drawerCount.textContent = history.length;
+  if (!dom.historyList) return; // not in new layout
+  if (dom.drawerCount) dom.drawerCount.textContent = history.length;
   if (!history.length) {
-    dom.historyList.innerHTML = '<p class="history-empty">No queries yet. Run a valuation to see history.</p>';
+    dom.historyList.innerHTML = '<p class="history-empty">No queries yet.</p>';
     return;
   }
   dom.historyList.innerHTML = '';
   history.forEach((item) => {
-    const cls         = riskClass(item.risk_level);
+    const cls = riskClass(item.risk_level);
     const marketValue = Number(item.market_value);
-    const variance    = parseFloat(item.variance_pct);
+    const variance = parseFloat(item.variance_pct);
     const div = document.createElement('div');
     div.className = 'history-item';
     div.innerHTML = `
-      <div>
-        <div class="history-zone">${escapeHTML(item.zone_name)}</div>
-        <div class="history-city text-muted">${escapeHTML(item.city)}</div>
-      </div>
-      <div class="history-rate">₹${isFinite(marketValue) ? marketValue.toLocaleString('en-IN') : '—'}/sqft</div>
-      <div class="history-variance ${escapeHTML(cls)}" style="font-family:var(--font-mono);font-size:0.72rem">
-        ${isFinite(variance) ? (variance > 0 ? '+' : '') + variance + '%' : '—'}
-      </div>
-      <span class="history-badge hm-badge ${escapeHTML(cls)}">${escapeHTML(item.risk_level)}</span>
+      <div><div class="history-zone">${escapeHTML(item.zone_name)}</div><div class="history-city">${escapeHTML(item.city)}</div></div>
+      <div>₹${isFinite(marketValue) ? marketValue.toLocaleString('en-IN') : '—'}/sqft</div>
+      <span class="hm-badge ${escapeHTML(cls)}">${escapeHTML(item.risk_level)}</span>
     `;
     dom.historyList.appendChild(div);
   });
 }
 
 export function renderHeatmap(city) {
+  if (!dom.heatmapWrap) return; // not in new layout
   if (!city) {
-    dom.heatmapWrap.innerHTML = '<div class="heatmap-empty">Select a city from the control panel to load the heatmap.</div>';
-    dom.heatmapSubtitle.textContent = 'Select a city to view all zones and their risk profile.';
+    dom.heatmapWrap.innerHTML = '<div class="heatmap-empty">Select a city to load the heatmap.</div>';
+    if (dom.heatmapSubtitle) dom.heatmapSubtitle.textContent = 'Select a city to view all zones.';
     return;
   }
 
@@ -406,9 +411,10 @@ function formulaEstimate(loc, age, metroKm, specLevel) {
 }
 
 export function renderPinnedChips(unpinZoneCallback) {
+  if (!dom.pinnedChips) return;
   dom.pinnedChips.innerHTML = '';
   if (!state.pinnedZones.length) {
-    dom.pinnedChips.innerHTML = '<span style="font-size:0.7rem;color:var(--clr-text-quaternary)">No zones pinned yet</span>';
+    dom.pinnedChips.innerHTML = '<span style="font-size:0.7rem;opacity:0.5">No zones pinned yet</span>';
     return;
   }
   state.pinnedZones.forEach((z) => {
@@ -431,8 +437,9 @@ export function renderPinnedChips(unpinZoneCallback) {
 }
 
 export function renderCompareTable() {
+  if (!dom.compareTableWrap) return;
   if (!state.pinnedZones.length) {
-    dom.compareTableWrap.innerHTML = '<div class="compare-empty">Pin at least one zone above to start comparing.</div>';
+    dom.compareTableWrap.innerHTML = '<div class="compare-empty">Pin at least one zone to start comparing.</div>';
     return;
   }
 

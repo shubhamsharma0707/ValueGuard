@@ -30,10 +30,10 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc:  ["'self'"],
-        scriptSrc:   ["'self'", 'cdn.jsdelivr.net'],
+        scriptSrc:   ["'self'", 'cdn.jsdelivr.net', "'unsafe-inline'"],
         styleSrc:    ["'self'", 'fonts.googleapis.com', "'unsafe-inline'"],
         fontSrc:     ["'self'", 'fonts.gstatic.com'],
-        imgSrc:      ["'self'", 'data:'],
+        imgSrc:      ["'self'", 'data:', 'images.unsplash.com'],
         connectSrc:  ["'self'"],
         objectSrc:   ["'none'"],
         frameAncestors: ["'none'"],

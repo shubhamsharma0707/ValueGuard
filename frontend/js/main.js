@@ -16,30 +16,37 @@ import {
 /* ─── Populate State Dropdowns ─────────────────────────────────────── */
 
 function populateStateDropdowns() {
-  [dom.stateSelect, dom.compareStateSelect].forEach((el) => {
-    if (!el) return;
+  const dropdowns = [dom.stateSelect, dom.compareStateSelect].filter(Boolean);
+  dropdowns.forEach((el) => {
     el.innerHTML = '<option value="">— Select State —</option>';
     INDIAN_STATES.forEach((s) => {
       const opt = document.createElement('option');
       opt.value = s;
       opt.textContent = s;
-      // Mark states that have data
       const hasData = state.locations.some((loc) => (CITY_STATE_MAP[loc.city] || '') === s);
       if (!hasData) opt.classList.add('state-no-data');
       el.appendChild(opt);
     });
     el.disabled = false;
   });
+
+  // Enable the Run Valuation button label update
+  const btn = document.getElementById('btn-valuate');
+  if (btn) btn.textContent = 'Run Valuation';
 }
 
 /* ─── Fetch Locations ──────────────────────────────────────────────── */
 
 async function fetchLocations() {
+  console.log('[DEBUG] fetchLocations() started');
   try {
     const data = await fetchLocationsAPI();
+    console.log('[DEBUG] fetchLocationsAPI returned', data?.length, 'items');
     state.locations = data;
     hideError();
+    console.log('[DEBUG] Calling populateStateDropdowns()');
     populateStateDropdowns();
+    console.log('[DEBUG] Calling applyURLParams()');
     applyURLParams();
   } catch (err) {
     console.error('[ValueGuard] Failed to load locations:', err);
@@ -238,29 +245,27 @@ function updateSliderFill(el) {
 }
 
 function initSliderReadouts() {
-  dom.sliderAge.addEventListener('input', () => {
-    const v = dom.sliderAge.value;
-    dom.valAge.textContent = `${v} yr${v === '1' ? '' : 's'}`;
-    dom.sliderAge.setAttribute('aria-valuenow', v);
-    updateSliderFill(dom.sliderAge);
-  });
-  dom.sliderMetro.addEventListener('input', () => {
-    const v = Number(dom.sliderMetro.value).toFixed(1);
-    dom.valMetro.textContent = `${v} km`;
-    dom.sliderMetro.setAttribute('aria-valuenow', v);
-    updateSliderFill(dom.sliderMetro);
-  });
-  dom.sliderSpeculation.addEventListener('input', () => {
-    const v = dom.sliderSpeculation.value;
-    dom.valSpeculation.textContent = speculationLabel(Number(v));
-    dom.sliderSpeculation.setAttribute('aria-valuenow', v);
-    updateSliderFill(dom.sliderSpeculation);
-  });
-  requestAnimationFrame(() => {
-    updateSliderFill(dom.sliderAge);
-    updateSliderFill(dom.sliderMetro);
-    updateSliderFill(dom.sliderSpeculation);
-  });
+  if (dom.sliderAge) {
+    dom.sliderAge.addEventListener('input', () => {
+      const v = dom.sliderAge.value;
+      if (dom.valAge) dom.valAge.textContent = `${v} yr${v === '1' ? '' : 's'}`;
+      dom.sliderAge.setAttribute('aria-valuenow', v);
+    });
+  }
+  if (dom.sliderMetro) {
+    dom.sliderMetro.addEventListener('input', () => {
+      const v = Number(dom.sliderMetro.value).toFixed(1);
+      if (dom.valMetro) dom.valMetro.textContent = `${v} km`;
+      dom.sliderMetro.setAttribute('aria-valuenow', v);
+    });
+  }
+  if (dom.sliderSpeculation) {
+    dom.sliderSpeculation.addEventListener('input', () => {
+      const v = dom.sliderSpeculation.value;
+      if (dom.valSpeculation) dom.valSpeculation.textContent = speculationLabel(Number(v));
+      dom.sliderSpeculation.setAttribute('aria-valuenow', v);
+    });
+  }
 }
 
 /* ─── Reveal animations ────────────────────────────────────────────── */
@@ -279,94 +284,131 @@ const debouncedValuate = debounce(submitValuation, 300);
 
 function initEventListeners() {
   // ── Main: State → City → Zone cascade ──
-  dom.stateSelect.addEventListener('change', () => {
-    const s = dom.stateSelect.value;
-    filterCitiesByState(s, dom.citySelect, dom.zoneSelect);
-    renderHeatmap(null);
-    resetResultCards();
-  });
+  if (dom.stateSelect) {
+    dom.stateSelect.addEventListener('change', () => {
+      const s = dom.stateSelect.value;
+      filterCitiesByState(s, dom.citySelect, dom.zoneSelect);
+      renderHeatmap(null);
+      resetResultCards();
+    });
+  }
 
-  dom.citySelect.addEventListener('change', () => {
-    const city = dom.citySelect.value;
-    filterZonesByCity(city, dom.zoneSelect);
-    renderHeatmap(city);
-    resetResultCards();
-  });
+  if (dom.citySelect) {
+    dom.citySelect.addEventListener('change', () => {
+      const city = dom.citySelect.value;
+      filterZonesByCity(city, dom.zoneSelect);
+      renderHeatmap(city);
+      resetResultCards();
+    });
+  }
 
-  dom.zoneSelect.addEventListener('change', debouncedValuate);
+  if (dom.zoneSelect) {
+    dom.zoneSelect.addEventListener('change', () => {
+      const btn = document.getElementById('btn-valuate');
+      if (btn) btn.disabled = !dom.zoneSelect.value;
+    });
+  }
 
-  // ── Sliders ──
-  dom.sliderAge.addEventListener('input', debouncedValuate);
-  dom.sliderMetro.addEventListener('input', debouncedValuate);
-  dom.sliderSpeculation.addEventListener('input', debouncedValuate);
+  // ── "Run Valuation" button ──
+  const btnValuate = document.getElementById('btn-valuate');
+  if (btnValuate) {
+    btnValuate.addEventListener('click', submitValuation);
+  }
+
+  // ── Sliders — auto-rerun if zone selected ──
+  if (dom.sliderAge)         dom.sliderAge.addEventListener('input', () => { if (dom.zoneSelect?.value) debouncedValuate(); });
+  if (dom.sliderMetro)       dom.sliderMetro.addEventListener('input', () => { if (dom.zoneSelect?.value) debouncedValuate(); });
+  if (dom.sliderSpeculation) dom.sliderSpeculation.addEventListener('input', () => { if (dom.zoneSelect?.value) debouncedValuate(); });
 
   // ── Compare: State → City → Zone cascade ──
-  dom.compareStateSelect.addEventListener('change', () => {
-    filterCitiesByState(dom.compareStateSelect.value, dom.compareCitySelect, dom.compareZoneSelect);
-    dom.btnPinZone.disabled = true;
-  });
+  if (dom.compareStateSelect) {
+    dom.compareStateSelect.addEventListener('change', () => {
+      filterCitiesByState(dom.compareStateSelect.value, dom.compareCitySelect, dom.compareZoneSelect);
+      if (dom.btnPinZone) dom.btnPinZone.disabled = true;
+    });
+  }
 
-  dom.compareCitySelect.addEventListener('change', () => {
-    filterZonesByCity(dom.compareCitySelect.value, dom.compareZoneSelect);
-    dom.btnPinZone.disabled = true;
-  });
+  if (dom.compareCitySelect) {
+    dom.compareCitySelect.addEventListener('change', () => {
+      filterZonesByCity(dom.compareCitySelect.value, dom.compareZoneSelect);
+      if (dom.btnPinZone) dom.btnPinZone.disabled = true;
+    });
+  }
 
-  dom.compareZoneSelect.addEventListener('change', () => {
-    dom.btnPinZone.disabled = !dom.compareZoneSelect.value;
-  });
+  if (dom.compareZoneSelect) {
+    dom.compareZoneSelect.addEventListener('change', () => {
+      if (dom.btnPinZone) dom.btnPinZone.disabled = !dom.compareZoneSelect.value;
+    });
+  }
 
-  dom.btnPinZone.addEventListener('click', pinZone);
+  if (dom.btnPinZone) dom.btnPinZone.addEventListener('click', pinZone);
 
   // ── History drawer ──
-  dom.drawerToggle.addEventListener('click', () => {
-    const isOpen = dom.historyDrawer.classList.toggle('open');
-    dom.drawerToggle.setAttribute('aria-expanded', String(isOpen));
-  });
+  if (dom.drawerToggle) {
+    dom.drawerToggle.addEventListener('click', () => {
+      const isOpen = dom.historyDrawer.classList.toggle('open');
+      dom.drawerToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+  }
 
   // ── Actions ──
-  dom.btnCopyURL.addEventListener('click', copyShareURL);
-  dom.btnPrint.addEventListener('click', () => {
-    dom.printTimestamp.textContent = `Generated: ${new Date().toLocaleString('en-IN')}`;
-    window.print();
-  });
+  if (dom.btnCopyURL) dom.btnCopyURL.addEventListener('click', copyShareURL);
+  if (dom.btnPrint) {
+    dom.btnPrint.addEventListener('click', () => {
+      if (dom.printTimestamp) dom.printTimestamp.textContent = `Generated: ${new Date().toLocaleString('en-IN')}`;
+      window.print();
+    });
+  }
 
   // ── Theme & mobile ──
-  dom.themeToggle.addEventListener('click', toggleTheme);
-  dom.hamburgerBtn.addEventListener('click', () => {
-    dom.sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-  });
-  dom.sidebarOverlay.addEventListener('click', closeSidebar);
+  if (dom.themeToggle) dom.themeToggle.addEventListener('click', toggleTheme);
+  if (dom.hamburgerBtn) {
+    dom.hamburgerBtn.addEventListener('click', () => {
+      dom.sidebar?.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+  }
+  if (dom.sidebarOverlay) dom.sidebarOverlay.addEventListener('click', closeSidebar);
 
   // ── EMI ──
-  dom.emiToggle.addEventListener('click', () => {
-    const expanded = dom.emiToggle.getAttribute('aria-expanded') === 'true';
-    dom.emiToggle.setAttribute('aria-expanded', String(!expanded));
-    dom.emiBody.hidden = expanded;
-    if (!expanded && state.lastResult) computeEMI();
-  });
-  [dom.emiArea, dom.emiRate, dom.emiTenure, dom.emiIncome].forEach((el) => {
+  if (dom.emiToggle) {
+    dom.emiToggle.addEventListener('click', () => {
+      const expanded = dom.emiToggle.getAttribute('aria-expanded') === 'true';
+      dom.emiToggle.setAttribute('aria-expanded', String(!expanded));
+      dom.emiBody.hidden = expanded;
+      if (!expanded && state.lastResult) computeEMI();
+    });
+  }
+  [dom.emiArea, dom.emiRate, dom.emiTenure, dom.emiIncome].filter(Boolean).forEach((el) => {
     el.addEventListener('input', debounce(computeEMI, 300));
   });
 
   // ── Sensitivity ──
-  dom.sensitivityAxis.addEventListener('change', updateSensitivityChart);
+  if (dom.sensitivityAxis) dom.sensitivityAxis.addEventListener('change', updateSensitivityChart);
 
   // ── Theme change ──
   window.addEventListener('themeChanged', refreshChartsTheme);
 }
 
-/* ─── Init ─────────────────────────────────────────────────────────── */
-
 async function init() {
+  console.log('[DEBUG] init() started');
   initTheme();
+  console.log('[DEBUG] initTheme done');
   initIcons();
+  console.log('[DEBUG] initIcons done');
   initRevealAnimations();
-  initTabs();
+  console.log('[DEBUG] initRevealAnimations done');
   initSliderReadouts();
+  console.log('[DEBUG] initSliderReadouts done');
   initEventListeners();
-  initScrollIndicator();
+  console.log('[DEBUG] initEventListeners done');
   await fetchLocations();
-  initTicker();
+  console.log('[DEBUG] fetchLocations done');
 }
 
-document.addEventListener('DOMContentLoaded', init);
+if (document.readyState === 'loading') {
+  console.log('[DEBUG] document.readyState === loading, adding DOMContentLoaded listener');
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  console.log('[DEBUG] document.readyState !== loading, calling init() directly');
+  init();
+}

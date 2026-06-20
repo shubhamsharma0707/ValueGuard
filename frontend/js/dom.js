@@ -1,99 +1,126 @@
-export const dom = {
-  // Controls
-  stateSelect:       document.getElementById('state-select'),
-  citySelect:        document.getElementById('city-select'),
-  zoneSelect:        document.getElementById('zone-select'),
-  sliderAge:         document.getElementById('slider-age'),
-  sliderMetro:       document.getElementById('slider-metro'),
-  sliderSpeculation: document.getElementById('slider-speculation'),
-  valAge:            document.getElementById('val-age'),
-  valMetro:          document.getElementById('val-metro'),
-  valSpeculation:    document.getElementById('val-speculation'),
+// DOM references — resolved lazily to ensure DOMContentLoaded has fired.
+// All selectors are re-evaluated on first access via getter pattern.
 
-  // Rate cards
-  circleRateValue:   document.getElementById('circle-rate-value'),
-  marketRateValue:   document.getElementById('market-rate-value'),
-  circleRateZone:    document.getElementById('circle-rate-zone'),
-  marketRateRisk:    document.getElementById('market-rate-risk'),
-  cardCircle:        document.getElementById('card-circle'),
-  cardMarket:        document.getElementById('card-market'),
+let _dom = null;
 
-  // Gauge
-  gaugeFill:         document.getElementById('gauge-fill'),
-  gaugeTrack:        document.querySelector('.gauge-track'),
-  riskBadge:         document.getElementById('risk-badge'),
+function createToast() {
+  let t = document.getElementById('toast');
+  if (t) return t;
+  t = document.createElement('div');
+  t.id = 'toast';
+  t.setAttribute('role', 'status');
+  t.setAttribute('aria-live', 'polite');
+  document.body.appendChild(t);
+  return t;
+}
 
-  // Insight
-  insightCard:       document.getElementById('insight-card'),
-  insightIcon:       document.getElementById('insight-icon'),
-  insightText:       document.getElementById('insight-text'),
+function buildDom() {
+  return {
+    // ── Tool section controls (new landing page IDs)
+    stateSelect:       document.getElementById('t-state'),
+    citySelect:        document.getElementById('t-city'),
+    zoneSelect:        document.getElementById('t-zone'),
+    sliderAge:         document.getElementById('t-age'),
+    sliderMetro:       document.getElementById('t-metro'),
+    sliderSpeculation: document.getElementById('t-spec'),
+    valAge:            document.getElementById('t-age-val'),
+    valMetro:          document.getElementById('t-metro-val'),
+    valSpeculation:    document.getElementById('t-spec-val'),
 
-  // Breakdown
-  bdBase:            document.getElementById('bd-base'),
-  bdMetro:           document.getElementById('bd-metro'),
-  bdDepr:            document.getElementById('bd-depr'),
-  bdSpec:            document.getElementById('bd-spec'),
+    // ── Rate cards (new IDs)
+    circleRateValue:   document.getElementById('res-circle-val'),
+    marketRateValue:   document.getElementById('res-market-val'),
+    circleRateZone:    document.querySelector('#res-circle .result-card-unit'),
+    marketRateRisk:    document.querySelector('#res-market .result-card-unit'),
+    cardCircle:        document.getElementById('res-circle'),
+    cardMarket:        document.getElementById('res-market'),
 
-  // History drawer
-  drawerToggle:      document.getElementById('drawer-toggle'),
-  drawerBody:        document.getElementById('drawer-body'),
-  historyDrawer:     document.getElementById('history-drawer'),
-  historyList:       document.getElementById('history-list'),
-  drawerCount:       document.getElementById('drawer-count'),
+    // ── Variance gauge (new IDs)
+    gaugeFill:         document.getElementById('variance-fill'),
+    gaugeTrack:        document.querySelector('.variance-track'),
+    riskBadge:         document.getElementById('res-risk'),
 
-  // Heatmap
-  heatmapWrap:       document.getElementById('heatmap-table-wrap'),
-  heatmapSubtitle:   document.getElementById('heatmap-subtitle'),
+    // ── Insight (new IDs)
+    insightCard:       document.getElementById('insight-box'),
+    insightIcon:       document.getElementById('insight-icon'),
+    insightText:       document.getElementById('insight-text'),
 
-  // Error banner & export
-  errorBanner:       document.getElementById('error-banner'),
-  errorMessage:      document.getElementById('error-message'),
-  btnCopyURL:        document.getElementById('btn-copy-url'),
-  btnPrint:          document.getElementById('btn-print'),
-  printTimestamp:    document.getElementById('print-timestamp'),
+    // ── Breakdown (same IDs retained)
+    bdBase:            document.getElementById('bd-base'),
+    bdMetro:           document.getElementById('bd-metro'),
+    bdDepr:            document.getElementById('bd-depr'),
+    bdSpec:            document.getElementById('bd-spec'),
 
-  // Theme & mobile
-  themeToggle:       document.getElementById('theme-toggle'),
-  themeIcon:         document.getElementById('theme-icon'),
-  hamburgerBtn:      document.getElementById('hamburger-btn'),
-  sidebar:           document.getElementById('sidebar'),
-  sidebarOverlay:    document.getElementById('sidebar-overlay'),
+    // ── History drawer — not in new layout, provide safe stubs
+    drawerToggle:      null,
+    drawerBody:        null,
+    historyDrawer:     null,
+    historyList:       null,
+    drawerCount:       null,
 
-  // EMI
-  emiToggle:         document.getElementById('emi-toggle'),
-  emiBody:           document.getElementById('emi-body'),
-  emiArea:           document.getElementById('emi-area'),
-  emiRate:           document.getElementById('emi-rate'),
-  emiTenure:         document.getElementById('emi-tenure'),
-  emiIncome:         document.getElementById('emi-income'),
-  emiLoanAmount:     document.getElementById('emi-loan-amount'),
-  emiMonthly:        document.getElementById('emi-monthly'),
-  emiInterest:       document.getElementById('emi-interest'),
-  emiBadge:          document.getElementById('emi-badge'),
+    // ── Heatmap — not in main view in new layout, safe stubs
+    heatmapWrap:       null,
+    heatmapSubtitle:   null,
 
-  // Sensitivity
-  sensitivityAxis:   document.getElementById('sensitivity-axis'),
-  sensitivityHint:   document.getElementById('sensitivity-hint'),
+    // ── Error / export — safe stubs (not in new layout)
+    errorBanner:       null,
+    errorMessage:      null,
+    btnCopyURL:        null,
+    btnPrint:          null,
+    printTimestamp:    null,
 
-  // Compare
-  compareStateSelect: document.getElementById('compare-state-select'),
-  compareCitySelect: document.getElementById('compare-city-select'),
-  compareZoneSelect: document.getElementById('compare-zone-select'),
-  btnPinZone:        document.getElementById('btn-pin-zone'),
-  pinnedChips:       document.getElementById('pinned-chips'),
-  compareTableWrap:  document.getElementById('compare-table-wrap'),
+    // ── Theme & mobile — not in new layout (handled inline)
+    themeToggle:       null,
+    themeIcon:         null,
+    hamburgerBtn:      null,
+    sidebar:           null,
+    sidebarOverlay:    null,
 
-  // Main content area
-  mainPanel:         document.getElementById('main-panel'),
+    // ── EMI — not in new layout, safe stubs
+    emiToggle:         null,
+    emiBody:           null,
+    emiArea:           null,
+    emiRate:           null,
+    emiTenure:         null,
+    emiIncome:         null,
+    emiLoanAmount:     null,
+    emiMonthly:        null,
+    emiInterest:       null,
+    emiBadge:          null,
 
-  // Toast
-  toast:             document.getElementById('toast'),
+    // ── Sensitivity
+    sensitivityAxis:   null,
+    sensitivityHint:   null,
 
+    // ── Compare zone panel
+    compareStateSelect: null,
+    compareCitySelect:  null,
+    compareZoneSelect:  null,
+    btnPinZone:         null,
+    pinnedChips:        null,
+    compareTableWrap:   null,
 
+    // ── Main panel
+    mainPanel:          document.getElementById('tool'),
 
-  // Ticker
-  tickerTrack:       document.getElementById('ticker-track'),
+    // ── Toast
+    toast:              createToast(),
 
-  // Scroll indicator
-  scrollIndicator:   document.getElementById('scroll-indicator'),
-};
+    // ── Ticker / scroll indicator (not in new layout)
+    tickerTrack:        null,
+    scrollIndicator:    null,
+  };
+}
+
+// Proxy that lazily builds the DOM map on first access (after DOMContentLoaded)
+export const dom = new Proxy({}, {
+  get(target, key) {
+    if (!_dom) _dom = buildDom();
+    return _dom[key];
+  },
+  set(target, key, value) {
+    if (!_dom) _dom = buildDom();
+    _dom[key] = value;
+    return true;
+  }
+});

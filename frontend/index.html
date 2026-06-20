@@ -3,484 +3,697 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="dark light" />
   <title>ValueGuard — Real Estate Fair Value Detection</title>
-  <meta name="description" content="ValueGuard compares government circle rates against estimated market rates to detect overpriced or speculative real estate in Indian tech hub cities." />
+  <meta name="description" content="ValueGuard detects overpriced and speculative real estate across Indian tech corridors. Compare circle rates, market values, and risk signals instantly." />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet" />
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css?v=2" />
-  <link rel="stylesheet" href="print.css" />
-
-  <!-- Chart.js via CDN — integrity hash ensures tamper-proof delivery -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"
-    integrity="sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF"
-    crossorigin="anonymous"
-    defer
-  ></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- Print-only report header -->
-<div class="print-header" aria-hidden="true">
-  <h1>ValueGuard — Property Valuation Report</h1>
-  <p id="print-timestamp"></p>
-</div>
+<!-- ══════════════════════════════════════════════════════════
+     STICKY NAV
+══════════════════════════════════════════════════════════ -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" aria-label="ValueGuard home">
+      <!-- Geometric robot-like logo made of SVG shapes -->
+      <svg class="logo-mark" width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="10" y="14" width="16" height="14" rx="3" fill="#1C1410"/>
+        <rect x="14" y="8" width="8" height="8" rx="2" fill="#1C1410"/>
+        <circle cx="14" cy="21" r="2.5" fill="#F0EBE1"/>
+        <circle cx="22" cy="21" r="2.5" fill="#F0EBE1"/>
+        <rect x="8" y="20" width="4" height="6" rx="2" fill="#1C1410"/>
+        <rect x="24" y="20" width="4" height="6" rx="2" fill="#1C1410"/>
+        <rect x="13" y="28" width="4" height="5" rx="2" fill="#1C1410"/>
+        <rect x="19" y="28" width="4" height="5" rx="2" fill="#1C1410"/>
+      </svg>
+      <span class="logo-text">ValueGuard</span>
+    </a>
 
-<!-- ══════════════════════ DATA TICKER — Live market feed ══════════════════════ -->
-<div class="ticker-bar" id="ticker-bar" aria-hidden="true">
-  <div class="ticker-track" id="ticker-track"></div>
-</div>
-
-<div class="app-shell">
-
-  <!-- ══════════════════════ TOP BAR ══════════════════════ -->
-  <header class="topbar" role="banner">
-    <div class="topbar-left">
-      <!-- Mobile hamburger -->
-      <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-      <div class="topbar-brand">
-        <span class="brand-name">Value<span>Guard</span></span>
-      </div>
-    </div>
-    <div class="topbar-meta">
-      <div class="live-badge" aria-label="Data status">
-        <div class="live-dot"></div>
-        <span>Data: Apr 2025</span>
-      </div>
-      <!-- Theme toggle -->
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
-        <span class="theme-icon" id="theme-icon" aria-hidden="true"></span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ══════════════════════ SIDEBAR OVERLAY (mobile) ══════════════════════ -->
-  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
-
-  <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
-  <aside class="sidebar" id="sidebar" role="complementary" aria-label="Valuation controls">
-
-    <!-- Location Selection -->
-    <section class="sidebar-section" aria-labelledby="location-section-title">
-      <h2 class="sidebar-title" id="location-section-title">Location</h2>
-
-      <div class="field-group">
-        <label class="field-label" for="state-select">State</label>
-        <div class="select-wrapper">
-          <select id="state-select" aria-label="Select state" disabled>
-            <option value="">— Loading… —</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label" for="city-select">City</label>
-        <div class="select-wrapper">
-          <select id="city-select" aria-label="Select city" disabled>
-            <option value="">— Select a state first —</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label" for="zone-select">Zone / Area</label>
-        <div class="select-wrapper">
-          <select id="zone-select" aria-label="Select zone" disabled>
-            <option value="">— Select a city first —</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <!-- Sliders -->
-    <section class="sidebar-section" aria-labelledby="params-section-title">
-      <h2 class="sidebar-title" id="params-section-title">Parameters</h2>
-
-      <!-- Property Age -->
-      <div class="slider-group">
-        <div class="slider-header">
-          <label class="slider-label" for="slider-age">Property Age</label>
-          <span class="slider-value" id="val-age" aria-live="polite" aria-atomic="true">5 yrs</span>
-        </div>
-        <input
-          type="range"
-          id="slider-age"
-          min="0" max="40" step="1" value="5"
-          aria-label="Property age in years"
-          aria-valuemin="0" aria-valuemax="40" aria-valuenow="5"
-        />
-        <div class="slider-hint" aria-hidden="true"><span>0 yrs</span><span>40 yrs</span></div>
-      </div>
-
-      <!-- Metro Distance -->
-      <div class="slider-group">
-        <div class="slider-header">
-          <label class="slider-label" for="slider-metro">Metro Distance</label>
-          <span class="slider-value" id="val-metro" aria-live="polite" aria-atomic="true">3.0 km</span>
-        </div>
-        <input
-          type="range"
-          id="slider-metro"
-          min="0" max="10" step="0.5" value="3"
-          aria-label="Distance to nearest metro station in kilometres"
-          aria-valuemin="0" aria-valuemax="10" aria-valuenow="3"
-        />
-        <div class="slider-hint" aria-hidden="true"><span>0 km</span><span>10 km</span></div>
-      </div>
-
-      <!-- Speculation Factor -->
-      <div class="slider-group">
-        <div class="slider-header">
-          <label class="slider-label" for="slider-speculation">Speculation Factor</label>
-          <span class="slider-value" id="val-speculation" aria-live="polite" aria-atomic="true">2 — Low</span>
-        </div>
-        <input
-          type="range"
-          id="slider-speculation"
-          min="1" max="5" step="1" value="2"
-          aria-label="Market speculation factor from 1 low to 5 high"
-          aria-valuemin="1" aria-valuemax="5" aria-valuenow="2"
-        />
-        <div class="slider-hint" aria-hidden="true"><span>1 Low</span><span>5 High</span></div>
-      </div>
-    </section>
-
-    <!-- ── EMI / Loan Calculator ── -->
-    <section class="sidebar-section emi-section" aria-labelledby="emi-section-title">
-      <h2 class="sidebar-title" id="emi-section-title">
-        <button class="collapsible-toggle" id="emi-toggle" aria-expanded="false" aria-controls="emi-body">
-          <span class="section-title-row"><span class="ui-icon" data-icon="loan" aria-hidden="true"></span> EMI Calculator</span>
-          <span class="drawer-chevron" data-icon="chevron" aria-hidden="true"></span>
-        </button>
-      </h2>
-      <div class="emi-body" id="emi-body" hidden>
-        <div class="emi-grid">
-          <div class="field-group">
-            <label class="field-label" for="emi-area">Property Size (sqft)</label>
-            <input type="number" id="emi-area" class="emi-input" min="100" max="10000" step="50" value="1000" aria-label="Property size in square feet" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="emi-rate">Interest Rate (%)</label>
-            <input type="number" id="emi-rate" class="emi-input" min="5" max="20" step="0.1" value="8.5" aria-label="Annual interest rate in percent" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="emi-tenure">Tenure (years)</label>
-            <input type="number" id="emi-tenure" class="emi-input" min="1" max="30" step="1" value="20" aria-label="Loan tenure in years" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="emi-income">Monthly Income (₹)</label>
-            <input type="number" id="emi-income" class="emi-input" min="10000" max="10000000" step="5000" value="150000" aria-label="Monthly gross income in rupees" />
-          </div>
-        </div>
-        <div class="emi-results" id="emi-results">
-          <div class="emi-result-row">
-            <span class="emi-result-label">Loan Amount</span>
-            <span class="emi-result-value" id="emi-loan-amount">—</span>
-          </div>
-          <div class="emi-result-row">
-            <span class="emi-result-label">Monthly EMI</span>
-            <span class="emi-result-value accent" id="emi-monthly">—</span>
-          </div>
-          <div class="emi-result-row">
-            <span class="emi-result-label">Total Interest</span>
-            <span class="emi-result-value" id="emi-interest">—</span>
-          </div>
-          <div class="emi-result-row">
-            <span class="emi-result-label">Affordability</span>
-            <span class="emi-badge" id="emi-badge">—</span>
-          </div>
-        </div>
-        <div class="emi-chart-wrap">
-          <canvas id="emi-chart" aria-label="Donut chart showing principal versus total interest breakdown"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- Actions — macOS Toolbar style -->
-    <section class="sidebar-section" aria-labelledby="actions-section-title">
-      <h2 class="sidebar-title" id="actions-section-title">Actions</h2>
-      <div class="export-row">
-        <button class="btn-toolbar" id="btn-copy-url" data-tip="Copy Link" aria-label="Copy shareable link to clipboard">
-          <span class="ui-icon" data-icon="link" aria-hidden="true"></span>
-        </button>
-        <button class="btn-toolbar" id="btn-print" data-tip="Print Report" aria-label="Print valuation report">
-          <span class="ui-icon" data-icon="print" aria-hidden="true"></span>
-        </button>
-      </div>
-    </section>
-
-    <!-- Error Banner -->
-    <div class="error-banner" id="error-banner" role="alert" aria-live="assertive">
-      <span class="ui-icon" data-icon="alert" aria-hidden="true"></span>
-      <span id="error-message">Unable to connect to server.</span>
-    </div>
-
-  </aside>
-
-  <!-- ══════════════════════ MAIN CONTENT ══════════════════════ -->
-  <main class="main-content" role="main" id="main-panel">
-    <section class="dashboard-brief" aria-labelledby="dashboard-title">
-      <div>
-        <p class="brief-kicker">Real estate valuation intelligence</p>
-        <h1 id="dashboard-title">Detect overpriced zones before the deal gets expensive.</h1>
-        <p class="brief-copy">Compare circle rates, estimated market value, infrastructure premiums, and speculation risk across Indian tech corridors.</p>
-      </div>
-      <div class="scroll-indicator-outer" aria-hidden="true">
-        <div class="scroll-indicator" id="scroll-indicator" aria-hidden="true">
-          <span class="scroll-indicator-text">Scroll down</span>
-          <span class="scroll-indicator-arrow">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5l4 4 4-4"/></svg>
-          </span>
-        </div>
-      </div>
-      <div class="brief-metrics" aria-label="Product coverage">
-        <div class="brief-metric">
-          <span>15</span>
-          <small>tracked zones</small>
-        </div>
-        <div class="brief-metric">
-          <span>4</span>
-          <small>risk signals</small>
-        </div>
-        <div class="brief-metric">
-          <span>12M</span>
-          <small>trend view</small>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tab Bar -->
-    <nav class="tab-bar" role="tablist" aria-label="Dashboard views">
-      <button
-        class="tab-btn active"
-        id="tab-btn-valuate"
-        role="tab"
-        aria-selected="true"
-        aria-controls="tab-valuate"
-      >
-        <span class="ui-icon" data-icon="scale" aria-hidden="true"></span> Valuate
-      </button>
-      <button
-        class="tab-btn"
-        id="tab-btn-heatmap"
-        role="tab"
-        aria-selected="false"
-        aria-controls="tab-heatmap"
-      >
-        <span class="ui-icon" data-icon="grid" aria-hidden="true"></span> Heatmap
-      </button>
-      <button
-        class="tab-btn"
-        id="tab-btn-compare"
-        role="tab"
-        aria-selected="false"
-        aria-controls="tab-compare"
-      >
-        <span class="ui-icon" data-icon="compare" aria-hidden="true"></span> Compare
-      </button>
+    <nav class="nav-links" role="navigation" aria-label="Main navigation">
+      <a href="#how-it-works" class="nav-link active">Home</a>
+      <a href="#tool" class="nav-link">Valuate</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#insights" class="nav-link">Insights</a>
+      <a href="#about" class="nav-link">About</a>
     </nav>
 
-    <!-- ─── Tab: Valuate ─── -->
-    <section class="tab-panel active" id="tab-valuate" role="tabpanel" aria-labelledby="tab-btn-valuate">
+    <div class="nav-actions">
+      <a href="#tool" class="btn-cta" id="nav-cta">Analyse Property</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
 
-      <!-- Rate Cards -->
-      <div class="rate-cards">
-        <!-- Circle Rate Card -->
-        <div class="rate-card neutral glass-card reveal-card" id="card-circle" aria-label="Government circle rate">
-          <div class="card-label">Govt. Circle Rate ₹/sqft</div>
-          <div class="card-value" id="circle-rate-value">—</div>
-          <div class="card-unit" id="circle-rate-zone">Select a zone to begin</div>
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <a href="#how-it-works" class="mobile-link">Home</a>
+    <a href="#tool" class="mobile-link">Valuate</a>
+    <a href="#features" class="mobile-link">Features</a>
+    <a href="#insights" class="mobile-link">Insights</a>
+    <a href="#about" class="mobile-link">About</a>
+    <a href="#tool" class="btn-cta mobile-cta">Analyse Property</a>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════════ -->
+<main>
+<section class="hero" id="hero" aria-labelledby="hero-title">
+  <div class="hero-text">
+    <h1 class="hero-heading" id="hero-title">Transparent,<br>fair, accurate.<br>Real estate truth.</h1>
+    <p class="hero-sub">Detect overpriced zones before the deal gets expensive. Compare circle rates against real market values across India's tech corridors.</p>
+    <div class="hero-cta-row">
+      <a href="#tool" class="btn-cta">Start Valuation</a>
+      <a href="#how-it-works" class="btn-ghost">See how it works</a>
+    </div>
+  </div>
+
+  <!-- Hero media — city/property photograph -->
+  <div class="hero-media" aria-hidden="true">
+    <div class="hero-image-wrap">
+      <img
+        src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1400&q=80&auto=format&fit=crop"
+        alt="Aerial view of urban Indian real estate development"
+        class="hero-img"
+        loading="eager"
+      />
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Live data — Apr 2025</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     TRUSTED BY — logo marquee
+══════════════════════════════════════════════════════════ -->
+<section class="trusted" aria-label="Used by analysts and investors in">
+  <p class="trusted-label">Analysing cities across</p>
+  <div class="trusted-track-wrap" aria-hidden="true">
+    <div class="trusted-track">
+      <div class="trusted-chip">Bengaluru</div>
+      <div class="trusted-chip">Hyderabad</div>
+      <div class="trusted-chip">Pune</div>
+      <div class="trusted-chip">Mumbai</div>
+      <div class="trusted-chip">Chennai</div>
+      <div class="trusted-chip">Delhi NCR</div>
+      <div class="trusted-chip">Bengaluru</div>
+      <div class="trusted-chip">Hyderabad</div>
+      <div class="trusted-chip">Pune</div>
+      <div class="trusted-chip">Mumbai</div>
+      <div class="trusted-chip">Chennai</div>
+      <div class="trusted-chip">Delhi NCR</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     VALUE PROPS — 3 column
+══════════════════════════════════════════════════════════ -->
+<section class="value-props" id="how-it-works" aria-labelledby="value-props-title">
+  <h2 class="section-heading" id="value-props-title">
+    Instant intelligence.<br>Shipping today.
+  </h2>
+
+  <div class="value-grid">
+    <div class="value-item">
+      <div class="value-icon" aria-hidden="true">
+        <!-- Abstract geometric icon: two overlapping squares -->
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <rect x="8" y="18" width="22" height="22" rx="4" fill="#C18A6B"/>
+          <rect x="20" y="10" width="22" height="22" rx="4" fill="#7EA8B8" opacity="0.85"/>
+        </svg>
+      </div>
+      <h3 class="value-title">For home buyers</h3>
+      <p class="value-desc">Know whether your dream property is fairly priced or speculative before you sign. Get circle rate vs market rate comparison in seconds.</p>
+    </div>
+
+    <div class="value-item">
+      <div class="value-icon" aria-hidden="true">
+        <!-- Abstract geometric icon: arch + square -->
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <rect x="22" y="24" width="18" height="18" rx="3" fill="#8B7355"/>
+          <path d="M14 40 V24 A14 14 0 0 1 42 24 V40" fill="#D4614A"/>
+        </svg>
+      </div>
+      <h3 class="value-title">For investors</h3>
+      <p class="value-desc">Identify undervalued zones and speculative hotspots. Compare multiple areas side-by-side with risk scores and variance analysis.</p>
+    </div>
+
+    <div class="value-item">
+      <div class="value-icon" aria-hidden="true">
+        <!-- Abstract geometric icon: square with pin -->
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <rect x="10" y="10" width="36" height="36" rx="6" fill="#C4A84B"/>
+          <circle cx="28" cy="24" r="6" fill="#F0EBE1"/>
+          <path d="M28 30 L28 42" stroke="#F0EBE1" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 class="value-title">For analysts</h3>
+      <p class="value-desc">Deep-dive into zone-level data across 15+ tracked corridors. Export reports, run sensitivity analysis, and benchmark against city averages.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     FEATURE BENTO GRID
+══════════════════════════════════════════════════════════ -->
+<section class="features" id="features" aria-labelledby="features-title">
+  <h2 class="section-heading" id="features-title">
+    A modern platform<br>for property intelligence
+  </h2>
+
+  <div class="bento-grid">
+
+    <!-- Card 1: Circle rate vs market — wide left -->
+    <div class="bento-card bento-card--wide bento-card--light" id="bento-rate">
+      <div class="bento-tag" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2z" fill="#1C1410"/></svg>
+      </div>
+      <h3 class="bento-title">Circle rate vs market gap</h3>
+      <p class="bento-desc">See exactly how much market prices deviate from government circle rates. The gap tells you everything about speculation risk.</p>
+      <div class="bento-visual bento-visual--bars" aria-hidden="true">
+        <div class="mini-bar-group">
+          <div class="mini-bar-wrap">
+            <div class="mini-bar" style="height:44%;background:#D4614A" title="Circle Rate"></div>
+            <div class="mini-bar" style="height:80%;background:#7EA8B8" title="Market Rate"></div>
+            <span class="mini-bar-label">Whitefield</span>
+          </div>
+          <div class="mini-bar-wrap">
+            <div class="mini-bar" style="height:38%;background:#D4614A"></div>
+            <div class="mini-bar" style="height:62%;background:#7EA8B8"></div>
+            <span class="mini-bar-label">Koramangala</span>
+          </div>
+          <div class="mini-bar-wrap">
+            <div class="mini-bar" style="height:55%;background:#D4614A"></div>
+            <div class="mini-bar" style="height:70%;background:#7EA8B8"></div>
+            <span class="mini-bar-label">Baner</span>
+          </div>
+          <div class="mini-bar-wrap">
+            <div class="mini-bar" style="height:30%;background:#D4614A"></div>
+            <div class="mini-bar" style="height:90%;background:#7EA8B8"></div>
+            <span class="mini-bar-label">Gachibowli</span>
+          </div>
         </div>
+        <div class="mini-legend">
+          <span class="mini-dot" style="background:#D4614A"></span><span>Circle Rate</span>
+          <span class="mini-dot" style="background:#7EA8B8"></span><span>Market Rate</span>
+        </div>
+      </div>
+    </div>
 
-        <!-- Market Rate Card -->
-        <div class="rate-card glass-card reveal-card" id="card-market" aria-label="Estimated market rate">
-          <div class="card-label">Est. Market Rate ₹/sqft</div>
-          <div class="card-value" id="market-rate-value">—</div>
-          <div class="card-unit" id="market-rate-risk">—</div>
+    <!-- Card 2: Risk scoring — top right -->
+    <div class="bento-card bento-card--image" id="bento-risk">
+      <div class="bento-card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80&auto=format&fit=crop" alt="Property risk assessment dashboard" class="bento-img" loading="lazy"/>
+        <div class="bento-img-label">Risk scoring</div>
+      </div>
+    </div>
+
+    <!-- Card 3: Safety-first / Transparent -->
+    <div class="bento-card bento-card--accent" id="bento-transparent">
+      <div class="bento-tag" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2L10 10 18 10" stroke="#F0EBE1" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="10" cy="10" r="8" stroke="#F0EBE1" stroke-width="1.5" fill="none"/></svg>
+      </div>
+      <h3 class="bento-title">Transparent methodology</h3>
+      <p class="bento-desc">Every valuation shows its full breakdown — base rate, metro premium, age depreciation, and speculation uplift. No black boxes.</p>
+    </div>
+
+    <!-- Card 4: Ready for developers — image card -->
+    <div class="bento-card bento-card--image bento-card--tall" id="bento-developer">
+      <div class="bento-card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80&auto=format&fit=crop" alt="Developer working with property data" class="bento-img" loading="lazy"/>
+        <div class="bento-img-label">Ready for analysts</div>
+      </div>
+    </div>
+
+    <!-- Card 5: Whole-body teleoperation analogue: Multi-zone comparison -->
+    <div class="bento-card bento-card--medium" id="bento-compare">
+      <div class="bento-tag" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <rect x="2" y="2" width="7" height="7" rx="2" fill="#D4614A"/>
+          <rect x="11" y="2" width="7" height="7" rx="2" fill="#C18A6B" opacity="0.7"/>
+          <rect x="2" y="11" width="7" height="7" rx="2" fill="#C4A84B" opacity="0.7"/>
+          <rect x="11" y="11" width="7" height="7" rx="2" fill="#7EA8B8" opacity="0.7"/>
+        </svg>
+      </div>
+      <h3 class="bento-title">Multi-zone comparison</h3>
+      <p class="bento-desc">Pin up to 3 zones and compare them side-by-side using a radar chart across 5 weighted factors.</p>
+    </div>
+
+    <!-- Card 6: Socially engaging analogue: Heatmap -->
+    <div class="bento-card bento-card--image" id="bento-heatmap">
+      <div class="bento-card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80&auto=format&fit=crop" alt="City property heatmap view" class="bento-img" loading="lazy"/>
+        <div class="bento-img-label">City heatmap</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     INTERACTIVE TOOL SECTION
+══════════════════════════════════════════════════════════ -->
+<section class="tool-section" id="tool" aria-labelledby="tool-title">
+  <h2 class="section-heading" id="tool-title">Valuate any zone<br>in seconds</h2>
+  <p class="section-sub">Select your city, zone, and adjust parameters to see the instant valuation.</p>
+
+  <div class="tool-shell">
+    <!-- Controls sidebar -->
+    <div class="tool-controls">
+      <div class="tool-control-group">
+        <label class="tool-label" for="t-state">State</label>
+        <div class="select-wrap">
+          <select id="t-state" aria-label="Select state" disabled>
+            <option value="">— Loading… —</option>
+          </select>
+          <span class="select-arrow" aria-hidden="true">▾</span>
         </div>
       </div>
 
-      <!-- Variance Gauge -->
-      <div class="gauge-card glass-card reveal-card" aria-label="Variance and risk level">
-        <div class="gauge-header">
-          <span class="gauge-title">Variance vs Circle Rate</span>
-          <span class="risk-badge default" id="risk-badge" aria-live="polite" aria-atomic="true">—</span>
+      <div class="tool-control-group">
+        <label class="tool-label" for="t-city">City</label>
+        <div class="select-wrap">
+          <select id="t-city" aria-label="Select city" disabled>
+            <option value="">— Select a state —</option>
+          </select>
+          <span class="select-arrow" aria-hidden="true">▾</span>
         </div>
-        <div class="gauge-track" role="meter" aria-label="Variance percentage" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-          <div class="gauge-fill" id="gauge-fill"></div>
+      </div>
+
+      <div class="tool-control-group">
+        <label class="tool-label" for="t-zone">Zone / Area</label>
+        <div class="select-wrap">
+          <select id="t-zone" aria-label="Select zone" disabled>
+            <option value="">— Select a city —</option>
+          </select>
+          <span class="select-arrow" aria-hidden="true">▾</span>
         </div>
-        <div class="gauge-scale" aria-hidden="true">
+      </div>
+
+      <div class="tool-control-group">
+        <div class="slider-label-row">
+          <label class="tool-label" for="t-age">Property Age</label>
+          <span class="slider-val" id="t-age-val" aria-live="polite">5 yrs</span>
+        </div>
+        <input type="range" id="t-age" min="0" max="40" step="1" value="5"
+          aria-label="Property age" aria-valuemin="0" aria-valuemax="40" aria-valuenow="5"/>
+        <div class="slider-ends" aria-hidden="true"><span>0</span><span>40 yrs</span></div>
+      </div>
+
+      <div class="tool-control-group">
+        <div class="slider-label-row">
+          <label class="tool-label" for="t-metro">Metro Distance</label>
+          <span class="slider-val" id="t-metro-val" aria-live="polite">3.0 km</span>
+        </div>
+        <input type="range" id="t-metro" min="0" max="10" step="0.5" value="3"
+          aria-label="Metro distance" aria-valuemin="0" aria-valuemax="10" aria-valuenow="3"/>
+        <div class="slider-ends" aria-hidden="true"><span>0</span><span>10 km</span></div>
+      </div>
+
+      <div class="tool-control-group">
+        <div class="slider-label-row">
+          <label class="tool-label" for="t-spec">Speculation Factor</label>
+          <span class="slider-val" id="t-spec-val" aria-live="polite">2 — Low</span>
+        </div>
+        <input type="range" id="t-spec" min="1" max="5" step="1" value="2"
+          aria-label="Speculation factor" aria-valuemin="1" aria-valuemax="5" aria-valuenow="2"/>
+        <div class="slider-ends" aria-hidden="true"><span>1 Low</span><span>5 High</span></div>
+      </div>
+
+      <div class="tool-actions">
+        <button class="btn-cta btn-full" id="btn-valuate" disabled aria-label="Run valuation">Run Valuation</button>
+      </div>
+    </div>
+
+    <!-- Results panel -->
+    <div class="tool-results" id="tool-results">
+
+      <!-- Metric cards -->
+      <div class="result-cards">
+        <div class="result-card" id="res-circle">
+          <span class="result-card-label">Govt. Circle Rate</span>
+          <span class="result-card-value" id="res-circle-val">—</span>
+          <span class="result-card-unit">₹ / sqft</span>
+        </div>
+        <div class="result-card result-card--accent" id="res-market">
+          <span class="result-card-label">Est. Market Rate</span>
+          <span class="result-card-value" id="res-market-val">—</span>
+          <span class="result-card-unit">₹ / sqft</span>
+        </div>
+      </div>
+
+      <!-- Variance bar -->
+      <div class="variance-wrap" id="variance-wrap">
+        <div class="variance-header">
+          <span class="variance-title">Variance vs Circle Rate</span>
+          <span class="risk-pill" id="res-risk">—</span>
+        </div>
+        <div class="variance-track" role="meter" aria-label="Variance" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div class="variance-fill" id="variance-fill"></div>
+        </div>
+        <div class="variance-scale" aria-hidden="true">
           <span>0%</span>
-          <span class="mark-20">20%</span>
-          <span class="mark-50">50%</span>
+          <span>20%</span>
+          <span>50%</span>
           <span>100%+</span>
         </div>
       </div>
 
-      <!-- Insight Card -->
-      <div class="insight-card glass-card reveal-card" id="insight-card" aria-live="polite" aria-atomic="true">
-        <span class="insight-icon" id="insight-icon" aria-hidden="true"></span>
-        <p class="insight-text" id="insight-text">
-          Select a city and zone, then adjust the sliders to generate a valuation. Results will appear here.
-        </p>
+      <!-- Insight -->
+      <div class="insight-box" id="insight-box" aria-live="polite">
+        <span class="insight-icon" id="insight-icon">💡</span>
+        <p id="insight-text">Select a city and zone, then click <strong>Run Valuation</strong> to see instant results.</p>
       </div>
 
-      <!-- Breakdown + Sensitivity row -->
-      <div class="bottom-row">
-        <!-- Breakdown -->
-        <div class="breakdown-card glass-card reveal-card" id="breakdown-card">
-          <div class="breakdown-title">Valuation Breakdown</div>
-          <div class="breakdown-grid">
-            <div class="breakdown-item">
-              <span class="breakdown-item-label">Base (Circle × Mult.)</span>
-              <span class="breakdown-item-value" id="bd-base">—</span>
-            </div>
-            <div class="breakdown-item">
-              <span class="breakdown-item-label">Metro Premium</span>
-              <span class="breakdown-item-value positive" id="bd-metro">—</span>
-            </div>
-            <div class="breakdown-item">
-              <span class="breakdown-item-label">Age Depreciation</span>
-              <span class="breakdown-item-value negative" id="bd-depr">—</span>
-            </div>
-            <div class="breakdown-item">
-              <span class="breakdown-item-label">Speculative Uplift</span>
-              <span class="breakdown-item-value positive" id="bd-spec">—</span>
-            </div>
+      <!-- Breakdown -->
+      <div class="breakdown-wrap" id="breakdown-wrap">
+        <div class="breakdown-title">Valuation Breakdown</div>
+        <div class="breakdown-rows">
+          <div class="breakdown-row">
+            <span class="breakdown-label">Base (Circle × Multiplier)</span>
+            <span class="breakdown-val" id="bd-base">—</span>
           </div>
-        </div>
-
-        <!-- Sensitivity Panel -->
-        <div class="sensitivity-card glass-card reveal-card" id="sensitivity-card">
-          <div class="sensitivity-header">
-            <div class="sensitivity-title">Sensitivity Analysis</div>
-            <div class="sensitivity-controls">
-              <select id="sensitivity-axis" class="sensitivity-select" aria-label="Select sensitivity axis">
-                <option value="speculation">Speculation Level</option>
-                <option value="age">Property Age</option>
-                <option value="metro">Metro Distance</option>
-              </select>
-            </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Metro Premium</span>
+            <span class="breakdown-val positive" id="bd-metro">—</span>
           </div>
-          <div class="sensitivity-chart-wrap">
-            <canvas id="sensitivity-chart" aria-label="Line chart showing how market value changes with the selected parameter"></canvas>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Age Depreciation</span>
+            <span class="breakdown-val negative" id="bd-depr">—</span>
           </div>
-          <div class="sensitivity-hint" id="sensitivity-hint">Run a valuation to enable sensitivity analysis.</div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Speculative Uplift</span>
+            <span class="breakdown-val positive" id="bd-spec">—</span>
+          </div>
         </div>
       </div>
 
-      <!-- Chart -->
-      <div class="chart-card glass-card reveal-card">
-        <div class="chart-header">
+      <!-- Chart area -->
+      <div class="tool-chart-wrap">
+        <div class="chart-title-row">
           <span class="chart-title">Rate Comparison — ₹/sqft</span>
           <div class="chart-legend" aria-hidden="true">
-            <span class="legend-dot" style="--dot-color: rgba(212,163,115,0.72)">Circle Rate</span>
-            <span class="legend-dot" style="--dot-color: rgba(10,132,255,0.72)">Market Rate</span>
-            <span class="legend-dot" style="--dot-color: rgba(128,128,128,0.5)">City Avg</span>
+            <span class="legend-chip" style="--c:#D4614A">Circle Rate</span>
+            <span class="legend-chip" style="--c:#7EA8B8">Market Rate</span>
+            <span class="legend-chip" style="--c:#9E9E9E">City Avg</span>
           </div>
         </div>
-        <div class="chart-container">
+        <div class="chart-canvas-wrap">
           <canvas id="comparison-chart" aria-label="Bar chart comparing circle rate, market rate, and city average"></canvas>
         </div>
       </div>
+    </div>
+  </div>
+</section>
 
-      <!-- Query History Drawer -->
-      <div class="history-drawer" id="history-drawer">
-        <button class="drawer-toggle" id="drawer-toggle" aria-expanded="false" aria-controls="drawer-body">
-          <span class="drawer-toggle-left">
-            <span class="ui-icon" data-icon="history" aria-hidden="true"></span>
-            <span>Last Queries</span>
-            <span class="drawer-count" id="drawer-count">0</span>
-          </span>
-          <span class="drawer-chevron" data-icon="chevron" aria-hidden="true"></span>
-        </button>
-        <div class="drawer-body" id="drawer-body" role="region" aria-label="Query history">
-          <div class="history-list" id="history-list">
-            <p class="history-empty">No queries yet. Run a valuation to see history.</p>
-          </div>
-        </div>
+
+<!-- ══════════════════════════════════════════════════════════
+     USE CASE CARDS (coloured shapes)
+══════════════════════════════════════════════════════════ -->
+<section class="use-cases" id="insights" aria-labelledby="use-cases-title">
+  <h2 class="section-heading section-heading--left" id="use-cases-title">Create new insights.<br>Act with confidence.</h2>
+
+  <div class="use-case-grid">
+
+    <div class="use-case-card use-case-card--blue">
+      <h3 class="use-case-title">Residential<br>&amp; apartments</h3>
+      <p class="use-case-desc">Evaluate 2BHK, 3BHK, and villa pricing against actual circle rates. Get depreciation-adjusted fair value before investing.</p>
+    </div>
+
+    <div class="use-case-card use-case-card--blob use-case-card--gold">
+      <div class="blob-shape" aria-hidden="true"></div>
+      <h3 class="use-case-title">Commercial<br>&amp; offices</h3>
+      <p class="use-case-desc">Track commercial corridor premiums, speculative surges near new infrastructure, and identify emerging office hubs early.</p>
+    </div>
+
+    <div class="use-case-card use-case-card--terracotta">
+      <h3 class="use-case-title">Land<br>&amp; plots</h3>
+      <p class="use-case-desc">Raw land valuation is opaque. ValueGuard brings structure — compare zone-level circle rates against active market listings.</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     STATS / METRICS STRIP
+══════════════════════════════════════════════════════════ -->
+<section class="stats-strip" aria-label="Platform metrics">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-number">15+</span>
+      <span class="stat-label">Tracked zones</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="stat-number">6</span>
+      <span class="stat-label">Major cities</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="stat-number">4</span>
+      <span class="stat-label">Risk signals</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="stat-number">100%</span>
+      <span class="stat-label">Transparent model</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     CTA SECTION — "Make it yours" equivalent
+══════════════════════════════════════════════════════════ -->
+<section class="cta-section" id="about" aria-labelledby="cta-title">
+  <h2 class="cta-heading" id="cta-title">Make smarter decisions</h2>
+
+  <div class="cta-pill-row">
+    <span class="cta-pill">Data from Apr 2025</span>
+    <a href="#tool" class="btn-cta">Analyse Property Now</a>
+  </div>
+
+  <!-- Decorative geometric robot illustrations -->
+  <div class="cta-shapes" aria-hidden="true">
+    <!-- Robot 1 -->
+    <div class="shape-robot shape-robot--1">
+      <svg width="100" height="140" viewBox="0 0 100 140" fill="none">
+        <circle cx="50" cy="20" r="18" fill="#7EA8B8"/>
+        <rect x="20" y="40" width="60" height="50" rx="8" fill="#5C8FA0"/>
+        <rect x="5" y="48" width="14" height="30" rx="7" fill="#7EA8B8"/>
+        <rect x="81" y="48" width="14" height="30" rx="7" fill="#7EA8B8"/>
+        <rect x="28" y="92" width="18" height="36" rx="9" fill="#5C8FA0"/>
+        <rect x="54" y="92" width="18" height="36" rx="9" fill="#5C8FA0"/>
+        <circle cx="38" cy="60" r="8" fill="#F0EBE1"/>
+        <circle cx="62" cy="60" r="8" fill="#F0EBE1"/>
+        <circle cx="38" cy="60" r="4" fill="#1C1410"/>
+        <circle cx="62" cy="60" r="4" fill="#1C1410"/>
+      </svg>
+    </div>
+    <!-- Robot 2 -->
+    <div class="shape-robot shape-robot--2">
+      <svg width="80" height="120" viewBox="0 0 80 120" fill="none">
+        <rect x="20" y="8" width="40" height="28" rx="6" fill="#D4614A"/>
+        <rect x="10" y="36" width="60" height="44" rx="8" fill="#C0503A"/>
+        <rect x="0" y="44" width="10" height="24" rx="5" fill="#D4614A"/>
+        <rect x="70" y="44" width="10" height="24" rx="5" fill="#D4614A"/>
+        <rect x="16" y="82" width="20" height="30" rx="10" fill="#C0503A"/>
+        <rect x="44" y="82" width="20" height="30" rx="10" fill="#C0503A"/>
+        <circle cx="28" cy="52" r="7" fill="#F0EBE1"/>
+        <circle cx="52" cy="52" r="7" fill="#F0EBE1"/>
+        <circle cx="28" cy="52" r="3.5" fill="#1C1410"/>
+        <circle cx="52" cy="52" r="3.5" fill="#1C1410"/>
+      </svg>
+    </div>
+    <!-- Robot 3 — tall -->
+    <div class="shape-robot shape-robot--3">
+      <svg width="90" height="150" viewBox="0 0 90 150" fill="none">
+        <rect x="25" y="4" width="40" height="32" rx="6" fill="#C4A84B"/>
+        <rect x="10" y="38" width="70" height="52" rx="10" fill="#B09438"/>
+        <rect x="0" y="48" width="10" height="28" rx="5" fill="#C4A84B"/>
+        <rect x="80" y="48" width="10" height="28" rx="5" fill="#C4A84B"/>
+        <rect x="18" y="92" width="22" height="40" rx="11" fill="#B09438"/>
+        <rect x="50" y="92" width="22" height="40" rx="11" fill="#B09438"/>
+        <circle cx="32" cy="58" r="9" fill="#F0EBE1"/>
+        <circle cx="58" cy="58" r="9" fill="#F0EBE1"/>
+        <circle cx="32" cy="58" r="4.5" fill="#1C1410"/>
+        <circle cx="58" cy="58" r="4.5" fill="#1C1410"/>
+      </svg>
+    </div>
+    <!-- Robot 4 — teal -->
+    <div class="shape-robot shape-robot--4">
+      <svg width="85" height="130" viewBox="0 0 85 130" fill="none">
+        <circle cx="42" cy="18" r="16" fill="#4CA88C"/>
+        <rect x="10" y="36" width="65" height="46" rx="9" fill="#3A9078"/>
+        <rect x="0" y="44" width="10" height="26" rx="5" fill="#4CA88C"/>
+        <rect x="75" y="44" width="10" height="26" rx="5" fill="#4CA88C"/>
+        <rect x="18" y="84" width="20" height="34" rx="10" fill="#3A9078"/>
+        <rect x="47" y="84" width="20" height="34" rx="10" fill="#3A9078"/>
+        <circle cx="30" cy="56" r="8" fill="#F0EBE1"/>
+        <circle cx="55" cy="56" r="8" fill="#F0EBE1"/>
+        <circle cx="30" cy="56" r="4" fill="#1C1410"/>
+        <circle cx="55" cy="56" r="4" fill="#1C1410"/>
+      </svg>
+    </div>
+    <!-- Robot 5 — terracotta -->
+    <div class="shape-robot shape-robot--5">
+      <svg width="95" height="145" viewBox="0 0 95 145" fill="none">
+        <rect x="22" y="2" width="51" height="34" rx="8" fill="#B85C3E"/>
+        <rect x="8" y="38" width="79" height="54" rx="10" fill="#A04E34"/>
+        <rect x="0" y="48" width="8" height="30" rx="4" fill="#B85C3E"/>
+        <rect x="87" y="48" width="8" height="30" rx="4" fill="#B85C3E"/>
+        <rect x="16" y="94" width="26" height="38" rx="13" fill="#A04E34"/>
+        <rect x="53" y="94" width="26" height="38" rx="13" fill="#A04E34"/>
+        <circle cx="34" cy="62" r="10" fill="#F0EBE1"/>
+        <circle cx="61" cy="62" r="10" fill="#F0EBE1"/>
+        <circle cx="34" cy="62" r="5" fill="#1C1410"/>
+        <circle cx="61" cy="62" r="5" fill="#1C1410"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════════ -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-card">
+    <div class="footer-brand">
+      <p class="footer-tagline">ValueGuard, bringing transparency<br>to real estate pricing in India.</p>
+      <p class="footer-sub-note">Data sourced from government circle rate records.<br>Built with accuracy and transparency.</p>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <span class="footer-col-heading">Explore</span>
+        <a href="#tool" class="footer-link">Valuate</a>
+        <a href="#features" class="footer-link">Features</a>
+        <a href="#" class="footer-link">Heatmap</a>
+        <a href="#" class="footer-link">Compare Zones</a>
       </div>
-
-    </section>
-
-    <!-- ─── Tab: City Heatmap ─── -->
-    <section class="tab-panel" id="tab-heatmap" role="tabpanel" aria-labelledby="tab-btn-heatmap">
-      <div class="heatmap-header">
-        <div class="heatmap-title">City Zone Heatmap</div>
-        <p class="heatmap-subtitle" id="heatmap-subtitle">Select a city to view all zones and their risk profile.</p>
+      <div class="footer-col">
+        <span class="footer-col-heading">About</span>
+        <a href="#" class="footer-link">Methodology</a>
+        <a href="#" class="footer-link">Data Sources</a>
+        <a href="#" class="footer-link">Coverage</a>
       </div>
-      <div class="heatmap-table-wrap" id="heatmap-table-wrap">
-        <div class="heatmap-empty">Select a city from the control panel to load the heatmap.</div>
+      <div class="footer-col">
+        <span class="footer-col-heading">Contact</span>
+        <a href="#" class="footer-link">Twitter / X ↗</a>
+        <a href="#" class="footer-link">LinkedIn ↗</a>
+        <a href="#" class="footer-link">GitHub ↗</a>
       </div>
-    </section>
+    </div>
 
-    <!-- ─── Tab: Compare Zones ─── -->
-    <section class="tab-panel" id="tab-compare" role="tabpanel" aria-labelledby="tab-btn-compare">
-      <div class="compare-header">
-        <div class="compare-title">Zone Comparison</div>
-        <p class="compare-subtitle">Pin up to 3 zones to compare them side-by-side.</p>
-      </div>
+    <div class="footer-contact-row">
+      <a href="mailto:hello@valueguard.in" class="footer-contact-link">Contact us</a>
+    </div>
 
-      <!-- Zone picker -->
-      <div class="compare-picker glass-card">
-        <div class="compare-picker-row">
-          <div class="select-wrapper">
-            <select id="compare-state-select" aria-label="Select state to add zone" disabled>
-              <option value="">— Select State —</option>
-            </select>
-          </div>
-          <div class="select-wrapper">
-            <select id="compare-city-select" aria-label="Select city to add zone" disabled>
-              <option value="">— Select City —</option>
-            </select>
-          </div>
-          <div class="select-wrapper">
-            <select id="compare-zone-select" aria-label="Select zone to pin" disabled>
-              <option value="">— Select Zone —</option>
-            </select>
-          </div>
-          <button class="btn-primary" id="btn-pin-zone" aria-label="Pin zone for comparison" disabled>
-            + Pin Zone
-          </button>
-        </div>
-        <!-- Pinned zone chips -->
-        <div class="pinned-chips" id="pinned-chips" aria-label="Pinned zones" aria-live="polite"></div>
-      </div>
+    <div class="footer-bottom">
+      <span>© 2025 ValueGuard</span>
+      <span><a href="#" class="footer-bottom-link">Privacy Policy</a></span>
+      <span><a href="#" class="footer-bottom-link">Terms of Use</a></span>
+    </div>
+  </div>
+</footer>
 
-      <!-- Comparison table -->
-      <div class="compare-table-wrap glass-card" id="compare-table-wrap">
-        <div class="compare-empty">Pin at least one zone above to start comparing.</div>
-      </div>
+</main>
 
-      <!-- Radar chart -->
-      <div class="radar-card glass-card" id="radar-card">
-        <div class="chart-header">
-          <span class="chart-title">Multi-Factor Radar — Relative Scores</span>
-        </div>
-        <div class="radar-chart-wrap">
-          <canvas id="radar-chart" aria-label="Radar chart comparing multiple factors across pinned zones"></canvas>
-        </div>
-      </div>
-    </section>
-
-  </main>
-</div>
-
-
-
-<!-- Toast notification -->
-<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
+<!-- Chart.js -->
+<script
+  src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"
+  integrity="sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF"
+  crossorigin="anonymous"
+  defer
+></script>
 <script type="module" src="js/main.js"></script>
+<script>
+// ── Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('nav--scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// ── Mobile menu
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobile-menu');
+hamburger.addEventListener('click', () => {
+  const open = mobileMenu.classList.toggle('mobile-menu--open');
+  hamburger.setAttribute('aria-expanded', open);
+  mobileMenu.setAttribute('aria-hidden', !open);
+});
+mobileMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    mobileMenu.classList.remove('mobile-menu--open');
+    hamburger.setAttribute('aria-expanded', false);
+    mobileMenu.setAttribute('aria-hidden', true);
+  });
+});
+
+// ── Active nav link on scroll
+const sections = ['hero', 'how-it-works', 'features', 'tool', 'insights'];
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.nav-link[href="#${id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+sections.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) observer.observe(el);
+});
+
+// ── Slider sync
+function syncSlider(inputId, valId, format) {
+  const input = document.getElementById(inputId);
+  const val = document.getElementById(valId);
+  if (!input || !val) return;
+  const update = () => { val.textContent = format(input.value); };
+  input.addEventListener('input', update);
+  update();
+}
+// also sync to tool controls if existing main.js doesn't
+syncSlider('t-age', 't-age-val', v => `${v} yrs`);
+syncSlider('t-metro', 't-metro-val', v => `${parseFloat(v).toFixed(1)} km`);
+syncSlider('t-spec', 't-spec-val', v => {
+  const labels = { 1: 'Very Low', 2: 'Low', 3: 'Medium', 4: 'High', 5: 'Very High' };
+  return `${v} — ${labels[v] || ''}`;
+});
+
+// ── Reveal on scroll
+const revealEls = document.querySelectorAll('.bento-card, .value-item, .use-case-card, .stat-item, .result-card');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('revealed');
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+revealEls.forEach(el => revealObs.observe(el));
+</script>
 </body>
 </html>

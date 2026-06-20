@@ -2,14 +2,14 @@ import { state, charts } from './state.js';
 import { dom } from './dom.js';
 import { riskClass } from './utils.js';
 
-const ACCENT = 'rgba(255, 255, 255, 0.7)';
-const ACCENT_STRONG = 'rgba(255, 255, 255, 0.92)';
-const ACCENT_BORDER = 'rgba(255, 255, 255, 1)';
-const ACCENT_GRADIENT = 'rgba(255, 255, 255, 0.24)';
-const BLUE = 'rgba(128, 128, 128, 0.7)';
-const BLUE_BORDER = 'rgba(128, 128, 128, 1)';
-const GRAY = 'rgba(128, 128, 128, 0.5)';
-const GRAY_STRONG = 'rgba(128, 128, 128, 0.7)';
+const ACCENT = 'rgba(28, 20, 16, 0.6)';
+const ACCENT_STRONG = 'rgba(28, 20, 16, 0.85)';
+const ACCENT_BORDER = 'rgba(28, 20, 16, 1)';
+const ACCENT_GRADIENT = 'rgba(212, 97, 74, 0.2)';
+const BLUE = 'rgba(126, 168, 184, 0.7)';
+const BLUE_BORDER = 'rgba(126, 168, 184, 1)';
+const GRAY = 'rgba(160, 152, 140, 0.5)';
+const GRAY_STRONG = 'rgba(160, 152, 140, 0.7)';
 
 
 function computeCityAverages(city) {
@@ -27,11 +27,11 @@ function riskBarColor(riskLevel, alpha) {
 }
 
 function chartBaseOptions() {
-  const isDark = !document.documentElement.getAttribute('data-theme');
-  const gridClr = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-  const tickClr = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)';
-  const tipBg   = isDark ? '#1d1d29' : '#ffffff';
-  const tipBody = isDark ? '#e2e2e2' : '#1e293b';
+  // New landing page is always light
+  const gridClr = 'rgba(0,0,0,0.06)';
+  const tickClr = 'rgba(28,20,16,0.5)';
+  const tipBg   = '#fff';
+  const tipBody = '#1C1410';
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -92,6 +92,7 @@ export function updateChart(data) {
 
   const opts = chartBaseOptions();
   const canvas = document.getElementById('comparison-chart');
+  if (!canvas) return; // not in DOM
   
   if (charts.comparisonChart) {
     charts.comparisonChart.data = chartData;
@@ -158,19 +159,22 @@ function formulaEstimate(loc, age, metroKm, specLevel) {
 
 export function updateSensitivityChart() {
   if (!state.lastResult) {
-    dom.sensitivityHint.textContent = 'Run a valuation to enable sensitivity analysis.';
+    if (dom.sensitivityHint) dom.sensitivityHint.textContent = 'Run a valuation to enable sensitivity analysis.';
     return;
   }
+
+  const canvas = document.getElementById('sensitivity-chart');
+  if (!canvas) return; // not in new layout
 
   const loc = state.locations.find((l) => l.zone_name === state.lastResult.zone_name && l.city === state.lastResult.city);
   if (!loc) return;
 
-  dom.sensitivityHint.textContent = '';
+  if (dom.sensitivityHint) dom.sensitivityHint.textContent = '';
 
-  const axis    = dom.sensitivityAxis.value;
-  const age     = Number(dom.sliderAge.value);
-  const metroKm = Number(dom.sliderMetro.value);
-  const spec    = Number(dom.sliderSpeculation.value);
+  const axis    = dom.sensitivityAxis?.value || 'speculation';
+  const age     = Number(dom.sliderAge?.value || 5);
+  const metroKm = Number(dom.sliderMetro?.value || 3);
+  const spec    = Number(dom.sliderSpeculation?.value || 2);
 
   let labels = [], values = [];
 
@@ -195,7 +199,6 @@ export function updateSensitivityChart() {
   const gridClr = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
   const tickClr = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)';
 
-  const canvas = document.getElementById('sensitivity-chart');
   const ctx    = canvas.getContext('2d');
 
   const grad = ctx.createLinearGradient(0, 0, 0, 120);
@@ -252,10 +255,12 @@ export function updateSensitivityChart() {
 
 export function renderRadarChart() {
   if (!state.pinnedZones.length) return;
+  const canvas = document.getElementById('radar-chart');
+  if (!canvas) return; // not in new layout
 
-  const age     = Number(dom.sliderAge.value);
-  const metroKm = Number(dom.sliderMetro.value);
-  const spec    = Number(dom.sliderSpeculation.value);
+  const age     = Number(dom.sliderAge?.value || 5);
+  const metroKm = Number(dom.sliderMetro?.value || 3);
+  const spec    = Number(dom.sliderSpeculation?.value || 2);
 
   const colours = [
     { border: ACCENT_BORDER,        bg: 'rgba(255, 255, 255, 0.12)' },
@@ -295,7 +300,6 @@ export function renderRadarChart() {
   const gridClr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
   const tickClr = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
 
-  const canvas = document.getElementById('radar-chart');
   if (charts.radarChart) {
     charts.radarChart.data.datasets = datasets;
     charts.radarChart.update('active');
