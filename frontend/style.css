@@ -44,6 +44,25 @@
   --nav-h:         72px;
 }
 
+[data-theme="dark"] {
+  --bg:            #181514;
+  --bg-card:       #24201E;
+  --bg-card-alt:   #2E2926;
+  --bg-footer:     #24201E;
+  --bg-dark:       #E3DDD1;
+  
+  --ink:           #F2EBE1;
+  --ink-muted:     #A69B91;
+  --ink-faint:     #6A615A;
+
+  --accent:        #D4614A;
+  --accent-hover:  #BF5240;
+  --accent-blue:   #6894A6;
+  --accent-gold:   #C4A84B;
+  --accent-green:  #4CA88C;
+  --accent-mauve:  #C18A6B;
+}
+
 /* ──────────────────────────────────────────────
    RESET & BASE
 ────────────────────────────────────────────── */

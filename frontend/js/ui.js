@@ -116,11 +116,16 @@ export function showSkeleton() {
 }
 
 export function initTheme() {
-  // New landing page doesn't use dark mode — keep light always
-  document.documentElement.removeAttribute('data-theme');
+  const current = localStorage.getItem('vg-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(current);
 }
 
 export function applyTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
   if (dom.themeIcon) dom.themeIcon.innerHTML = iconSVG(theme === 'light' ? 'moon' : 'sun');
   if (dom.themeToggle) dom.themeToggle.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
   localStorage.setItem('vg-theme', theme);
