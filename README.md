@@ -10,7 +10,7 @@
 
 ---
 
-## 🌟 What It Does
+## What It Does
 
 ValueGuard is a modern property valuation dashboard that brings transparency to real estate by covering **62 zones across 23 cities in 9 states**. It helps home buyers, investors, and analysts by:
 
@@ -25,7 +25,7 @@ ValueGuard is a modern property valuation dashboard that brings transparency to 
 
 ---
 
-## 📈 Key Features
+## Key Features
 
 | Feature | Description |
 |---|---|
@@ -38,7 +38,7 @@ ValueGuard is a modern property valuation dashboard that brings transparency to 
 
 ---
 
-## 📐 Valuation Formula
+## Valuation Formula
 
 The estimated market value per square foot is computed in a fully transparent 4-step process:
 
@@ -72,7 +72,7 @@ Risk Levels:  < 20% → Safe  |  20–50% → Caution  |  > 50% → High Risk
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -84,7 +84,7 @@ Risk Levels:  < 20% → Safe  |  20–50% → Caution  |  > 50% → High Risk
 
 ---
 
-## 🚀 Setup & Run
+## Setup & Run
 
 ### Prerequisites
 - Node.js v18+
@@ -107,7 +107,7 @@ The server starts at `http://localhost:3000` and serves the frontend statically.
 
 ---
 
-## 🌐 API Reference
+## API Reference
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -128,7 +128,7 @@ The server starts at `http://localhost:3000` and serves the frontend statically.
 
 ---
 
-## 🛡️ Security Measures
+## Security Measures
 
 ValueGuard is built with security in mind from day one:
 
@@ -139,7 +139,7 @@ ValueGuard is built with security in mind from day one:
 
 ---
 
-## 📊 Zone Database
+## Zone Database
 
 **62 zones · 23 cities · 9 states**
 
@@ -157,7 +157,7 @@ ValueGuard is built with security in mind from day one:
 
 ---
 
-## 📚 Data Sources
+## Data Sources
 
 All circle rates are sourced from official government portals for 2024-25:
 - Haryana HRERA / Collector Rate Schedule
@@ -168,6 +168,6 @@ All circle rates are sourced from official government portals for 2024-25:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
