@@ -16,12 +16,27 @@ export async function submitValuationAPI(payload) {
     const errBody = await res.json().catch(() => ({}));
     throw new Error(errBody.error || `HTTP ${res.status}`);
   }
-  return await res.json();
+  const result = await res.json();
+
+  try {
+    const stored = localStorage.getItem('vg-history');
+    let history = stored ? JSON.parse(stored) : [];
+    history.unshift({ ...result, location_id: payload.location_id });
+    if (history.length > 5) history.pop();
+    localStorage.setItem('vg-history', JSON.stringify(history));
+  } catch (e) {
+    console.warn('Could not save history locally', e);
+  }
+
+  return result;
 }
 
 export async function fetchHistoryAPI() {
-  const res = await fetch(`${API_BASE}/history`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return await res.json();
+  try {
+    const stored = localStorage.getItem('vg-history');
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    return [];
+  }
 }
 

@@ -45,8 +45,8 @@ app.use(
 
 // ─── CORS ───────────────────────────────────────────────────────────────────
 // Allow: same-origin (no Origin header), localhost dev servers, and any
-// *.railway.app subdomain so Railway's own domain can call the API.
-const RAILWAY_ORIGIN_RE = /^https:\/\/[a-z0-9-]+(?:\.up)?\.railway\.app$/i;
+// *.railway.app or *.vercel.app subdomain so platforms can call the API.
+const HOSTING_ORIGIN_RE = /^https:\/\/[a-z0-9-]+(?:\.up)?\.(?:railway|vercel)\.app$/i;
 
 app.use(
   cors({
@@ -55,7 +55,7 @@ app.use(
       if (!origin) return cb(null, true); // same-origin / curl / Postman
       if (
         /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
-        RAILWAY_ORIGIN_RE.test(origin)
+        HOSTING_ORIGIN_RE.test(origin)
       ) {
         console.log('[CORS Debug] Allowed origin:', origin);
         return cb(null, true);
@@ -125,7 +125,6 @@ if (require.main === module) {
     console.log(`   Endpoints:`);
     console.log(`   GET  http://localhost:3000/api/locations`);
     console.log(`   POST http://localhost:3000/api/valuate`);
-    console.log(`   GET  http://localhost:3000/api/history`);
     console.log(`   GET  http://localhost:3000/api/trends/:location_id`);
   });
 

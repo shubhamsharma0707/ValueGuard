@@ -17,11 +17,6 @@ const {
   buildReasonText
 } = require('../services/valuationService');
 
-/**
- * In-memory session store for the last 5 valuations.
- * @type {Array<Object>}
- */
-const valuationHistory = [];
 
 /**
  * Validates and sanitises a location_id string.
@@ -133,19 +128,7 @@ router.post('/valuate', (req, res) => {
     timestamp:    new Date().toISOString(),
   };
 
-  // ─── Store in session history (last 5) ───────────────────────────────────
-  valuationHistory.unshift({ ...result, location_id });
-  if (valuationHistory.length > 5) valuationHistory.pop();
-
   res.json(result);
-});
-
-/**
- * GET /api/history
- * Returns the last 5 valuations stored in the in-memory session array.
- */
-router.get('/history', (req, res) => {
-  res.json(valuationHistory);
 });
 
 module.exports = router;
