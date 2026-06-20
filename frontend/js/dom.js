@@ -69,12 +69,12 @@ function buildDom() {
     btnPrint:          null,
     printTimestamp:    null,
 
-    // ── Theme & mobile — not in new layout (handled inline)
-    themeToggle:       null,
-    themeIcon:         null,
-    hamburgerBtn:      null,
-    sidebar:           null,
-    sidebarOverlay:    null,
+    // ── Theme & mobile
+    themeToggle:       document.getElementById('theme-toggle'),
+    themeIcon:         document.getElementById('theme-icon'),
+    hamburgerBtn:      document.getElementById('hamburger'),
+    sidebar:           document.getElementById('sidebar'),
+    sidebarOverlay:    document.getElementById('sidebar-overlay'),
 
     // ── EMI
     emiToggle:         document.getElementById('emi-toggle'),
