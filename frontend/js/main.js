@@ -51,7 +51,7 @@ async function fetchLocations() {
   } catch (err) {
     console.error('[ValueGuard] Failed to load locations:', err);
     if (dom.stateSelect) {
-      dom.stateSelect.innerHTML = '<option value="">⚠ Failed to load — reload page</option>';
+      dom.stateSelect.innerHTML = '<option value=""> Failed to load — reload page</option>';
       dom.stateSelect.disabled = false;
     }
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';

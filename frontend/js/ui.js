@@ -233,7 +233,7 @@ export function updateResults(data) {
   }
 
   // Insight box
-  if (dom.insightIcon) dom.insightIcon.textContent = riskIconEmoji(data.risk_level);
+  if (dom.insightIcon) dom.insightIcon.innerHTML = riskIcon(data.risk_level);
   if (dom.insightText) dom.insightText.textContent = data.reason_text;
   if (dom.insightCard) dom.insightCard.className = `insight-box ${cls}`;
 
@@ -255,13 +255,13 @@ export function updateResults(data) {
   if (btn) btn.textContent = 'Rerun Valuation';
 }
 
-function riskIconEmoji(level) {
+function riskIcon(level) {
   switch(level) {
-    case 'Safe': return '✅';
-    case 'Caution': return '⚠️';
-    case 'High Risk': return '🔴';
-    case 'Extreme Risk': return '🚨';
-    default: return '💡';
+    case 'Safe': return iconSVG('check');
+    case 'Caution': return iconSVG('alert');
+    case 'High Risk': return iconSVG('risk');
+    case 'Extreme Risk': return iconSVG('risk');
+    default: return iconSVG('insight');
   }
 }
 
