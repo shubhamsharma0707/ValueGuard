@@ -58,9 +58,9 @@ function buildDom() {
     historyList:       null,
     drawerCount:       null,
 
-    // ── Heatmap — not in main view in new layout, safe stubs
-    heatmapWrap:       null,
-    heatmapSubtitle:   null,
+    // ── Heatmap
+    heatmapWrap:       document.getElementById('heatmap-wrap'),
+    heatmapSubtitle:   document.getElementById('heatmap-subtitle'),
 
     // ── Error / export — safe stubs (not in new layout)
     errorBanner:       null,
